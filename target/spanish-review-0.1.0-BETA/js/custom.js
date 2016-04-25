@@ -14,16 +14,9 @@ function onSignIn(googleUser) {
     var xhr = new XMLHttpRequest();
     var id_token = googleUser.getAuthResponse().id_token;
     console.log("id_token: " + id_token);
-    $.ajax({
-        type: 'POST',
-        url: '/login',
-        dataType: 'json',
-        success: function(data) {
-            console.log(data['sign_in']);
-        },
-        data: {"idtoken":id_token},
-        async: true
-    });
+    $.post('/login', {"idtoken": id_token}).done( function(data) {
+            console.log('Signed in as: ' + xhr.responseText);
+        });
 }
 
 function signOut() {
