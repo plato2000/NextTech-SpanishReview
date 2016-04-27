@@ -27,43 +27,61 @@
     </head>
     <body>
         <!--<div class="whole-page-container">-->
-            <div class="navbar navbar-default navbar-fixed-top top">
-                <div class="container">
-                    <div class="navbar-header">
-                        <a href="../" class="navbar-brand">Spanish Review</a>
-                        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                    </div>
-                    <div class="navbar-collapse collapse" id="navbar-main">
-                        <ul class="nav navbar-nav">
+        <div class="navbar navbar-default navbar-fixed-top top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a href="../" class="navbar-brand">Spanish Review</a>
+                    <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="navbar-collapse collapse" id="navbar-main">
+                    <ul class="nav navbar-nav">
 
-                        </ul>
+                    </ul>
 
-                        <ul class="nav navbar-nav navbar-right">
-                            <li><div class="g-signin2" data-onsuccess="onSignIn"></div></li>
-                            <!--<li><a href="http://builtwithbootstrap.com/" target="_blank">Built With Bootstrap</a></li>-->
-                            <!--<li><a href="https://wrapbootstrap.com/?ref=bsw" target="_blank">WrapBootstrap</a></li>-->
-                        </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><div class="g-signin2" data-onsuccess="onSignIn"></div></li>
+                        <li><a href="javascript:signOut()">Sign out</a></li>
+                        <!--<li><a href="http://builtwithbootstrap.com/" target="_blank">Built With Bootstrap</a></li>-->
+                        <!--<li><a href="https://wrapbootstrap.com/?ref=bsw" target="_blank">WrapBootstrap</a></li>-->
+                    </ul>
 
-                    </div>
                 </div>
             </div>
-
-            <br />
-            <br />
-            <br />
-                <div class="row">
-                    <div class="col-sm-8" id="worksheet-container">
-                    </div>
-                    <div class="col-sm-4 right" id="wordbank-container">
-
-                    </div>
-
-            <!--</div>-->
         </div>
+
+        <br />
+        <br />
+        <br />
+        <div class="row">
+            <div class="col-sm-8" id="worksheet-container">
+            </div>
+            <div class="col-sm-4 right" id="wordbank-container">
+            </div>
+        </div>
+        <div class="modal fade" id="signin-failure" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Could not sign in.</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Sign in failed. Make sure you're signing in with your mcpsmd.net Google account. Your data will not be seen by your teacher unless you do this.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
         <script src="/js/custom.js"></script>
     </body>
 </html>

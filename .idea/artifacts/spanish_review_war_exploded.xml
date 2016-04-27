@@ -22,6 +22,19 @@
           <element id="library" level="project" name="Maven: com.google.api-client:google-api-client-appengine:1.20.0" />
           <element id="library" level="project" name="Maven: com.google.oauth-client:google-oauth-client-appengine:1.20.0" />
           <element id="library" level="project" name="Maven: com.google.http-client:google-http-client-appengine:1.20.0" />
+          <element id="library" level="project" name="Maven: com.google.cloud:gcloud-java-datastore:0.2.0" />
+          <element id="library" level="project" name="Maven: com.google.cloud:gcloud-java-core:0.2.0" />
+          <element id="library" level="project" name="Maven: com.google.auth:google-auth-library-credentials:0.3.1" />
+          <element id="library" level="project" name="Maven: com.google.auth:google-auth-library-oauth2-http:0.3.1" />
+          <element id="library" level="project" name="Maven: com.google.guava:guava:19.0" />
+          <element id="library" level="project" name="Maven: com.google.http-client:google-http-client-jackson:1.21.0" />
+          <element id="library" level="project" name="Maven: org.codehaus.jackson:jackson-core-asl:1.9.11" />
+          <element id="library" level="project" name="Maven: joda-time:joda-time:2.9.2" />
+          <element id="library" level="project" name="Maven: org.json:json:20151123" />
+          <element id="library" level="project" name="Maven: com.google.cloud.datastore:datastore-v1beta3-protos:1.0.0-beta" />
+          <element id="library" level="project" name="Maven: com.google.protobuf:protobuf-java:3.0.0-beta-1" />
+          <element id="library" level="project" name="Maven: com.google.cloud.datastore:datastore-v1beta3-proto-client:1.0.0-beta" />
+          <element id="library" level="project" name="Maven: com.google.http-client:google-http-client-protobuf:1.20.0" />
           <element id="library" level="project" name="Maven: com.google.api-client:google-api-client-servlet:1.20.0" />
           <element id="library" level="project" name="Maven: com.google.oauth-client:google-oauth-client-servlet:1.20.0" />
           <element id="library" level="project" name="Maven: com.google.http-client:google-http-client-jdo:1.20.0" />

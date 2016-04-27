@@ -45,7 +45,7 @@ public class LoginHandlerServlet extends HttpServlet {
 //        System.out.println(request.getParameter("idtoken"));
         JSONObject idToken = Utils.verifyID(request.getParameter("idtoken"));
         try {
-            if (idToken != null && idToken.get("hd").equals("mcpsmd.net")) {
+            if (idToken != null && idToken.containsKey("hd") && idToken.get("hd").equals("mcpsmd.net")) {
                 out.println("{ \"sign_in\": true, \"name\": \"" + idToken.get("name") + "\"}");
                 System.out.println(idToken.get("name") + " signed in.");
             } else {
@@ -56,7 +56,7 @@ public class LoginHandlerServlet extends HttpServlet {
             out.println("{ \"sign_in\": \"false\"}");
         }
         out.close();
-        System.out.println("Reached end of post thingy");
+//        System.out.println("Reached end of post thingy");
     }
 
 }

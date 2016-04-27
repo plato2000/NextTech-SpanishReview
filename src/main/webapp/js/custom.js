@@ -20,6 +20,10 @@ function onSignIn(googleUser) {
         dataType: 'json',
         success: function(data) {
             console.log(data['sign_in']);
+            if(data['sign_in'] == "false") {
+                signOut();
+                $("#signin-failure").modal();
+            }
         },
         data: {"idtoken":id_token},
         async: true
