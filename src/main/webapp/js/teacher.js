@@ -1,9 +1,6 @@
 /**
  * Created by plato2000 on 4/21/16.
  */
-$(function() {
-    $(".row").height("100%");
-});
 
 
 function start() {
@@ -11,15 +8,14 @@ function start() {
         auth2 = gapi.auth2.init({
             client_id: '453755821502-1k95kijujmdh4g16opd1qpaqn6miboro.apps.googleusercontent.com',
             // Scopes to request in addition to 'profile' and 'email'
-            scope: 'https://www.googleapis.com/auth/classroom.courses.readonly'
-
+            scope: 'profile email https://www.googleapis.com/auth/classroom.courses.readonly https://www.googleapis.com/auth/classroom.rosters.readonly https://www.googleapis.com/auth/classroom.profile.emails'
         });
     });
 }
 
 $('#g-signin2').click(function() {
     // signInCallback defined in step 6.
-    auth2.grantOfflineAccess({'redirect_uri': 'localhost'}).then(signInCallback);
+    auth2.grantOfflineAccess({'redirect_uri': 'postmessage'}).then(signInCallback);
 });
 
 function signInCallback(authResult) {
@@ -31,7 +27,7 @@ function signInCallback(authResult) {
         // Send the code to the server
         $.ajax({
             type: 'POST',
-            url: '/login',
+            url: '/teacherlogin',
             contentType: 'application/octet-stream; charset=utf-8',
             success: function(data) {
                 // Handle or verify the server response.

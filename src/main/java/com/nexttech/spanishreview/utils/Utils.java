@@ -15,6 +15,9 @@ import java.net.URL;
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
 
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 
@@ -50,14 +53,13 @@ public class Utils {
 //                // a GoogleIdTokenVerifier for each issuer and try them both.
 //                .setIssuer("accounts.google.com")
 //                .build();
-//        String returnedStringFromVerification = getHTML("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + idTokenString);
 
 // (Receive idTokenString by HTTPS POST)
         try {
             String returnedStringFromVerification = getHTML("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + idTokenString);
             System.out.println(returnedStringFromVerification);
             JSONObject json = (JSONObject)new JSONParser().parse(returnedStringFromVerification);
-            if(json.get("aud").equals("1081294254756-cs889poi4i8qr3bqtc7gv42fhmsccn8g.apps.googleusercontent.com")) {
+            if(json.get("aud").equals("453755821502-1k95kijujmdh4g16opd1qpaqn6miboro.apps.googleusercontent.com")) {
                 if(json.get("iss").equals("accounts.google.com") || json.get("iss").equals("https://accounts.google.com")) {
 //                    System.out.println("exp: " + Long.getLong("12"));
                     if(Long.parseLong((String) json.get("exp")) >= (System.currentTimeMillis() % 1000)) {
@@ -71,4 +73,32 @@ public class Utils {
             return null;
         }
     }
+
+    public static String readFile(String path, Charset encoding)
+            throws IOException
+    {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
+    }
+
+    public static String array2DToJson(String name, Object[][] array) {
+        StringBuilder s = new StringBuilder();
+        s.append("{ \"" + name + "\": [\n");
+        for(int i = 0; i < array.length; i++) {
+            if(i != 0) {
+                s.append(",\n");
+            }
+            s.append("\t[");
+            for(int j = 0; j < array[i].length; j++) {
+                if(j != 0) {
+                   s.append(", ");
+                }
+                s.append("\"" + array[i][j].toString() + "\"");
+            }
+            s.append("]");
+        }
+        s.append("\n\t]\n}");
+        return s.toString();
+    }
+
 }

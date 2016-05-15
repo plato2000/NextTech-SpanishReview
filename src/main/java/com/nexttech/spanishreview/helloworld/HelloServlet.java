@@ -16,6 +16,9 @@
 
 package com.nexttech.spanishreview.helloworld;
 
+import com.nexttech.spanishreview.utils.Utils;
+import com.nexttech.spanishreview.worksheet.WorksheetGenerator;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -30,10 +33,12 @@ import javax.servlet.http.HttpServletResponse;
 @SuppressWarnings("serial")
 public class HelloServlet extends HttpServlet {
 
-  @Override
-  public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    PrintWriter out = resp.getWriter();
-    out.println("Hello, world");
-  }
+    @Override
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        PrintWriter out = resp.getWriter();
+        out.println("Hello, world");
+        WorksheetGenerator generator = new WorksheetGenerator();
+        out.println(Utils.array2DToJson("ws", generator.getRegularWorksheet()));
+    }
 }
 // [END example]
