@@ -8,6 +8,10 @@
         <servlet-class>com.nexttech.spanishreview.users.UsersServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>oauth2Callback</servlet-name>
+        <servlet-class>com.nexttech.spanishreview.auth.OAuth2Callback</servlet-class>
+    </servlet>
+    <servlet>
     <servlet-name>main</servlet-name>
         <jsp-file>/index.jsp</jsp-file>
     </servlet>
@@ -27,13 +31,17 @@
         <servlet-name>helloworld</servlet-name>
         <url-pattern>/hello</url-pattern>
     </servlet-mapping>
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>main</web-resource-name>
-            <url-pattern>/</url-pattern>
-        </web-resource-collection>
-        <auth-constraint>
-            <role-name>*</role-name>
-        </auth-constraint>
-    </security-constraint>
+    <servlet-mapping>
+        <servlet-name>oauth2Callback</servlet-name>
+        <url-pattern>/oauth2callback/*</url-pattern>
+    </servlet-mapping>
+    <!--<security-constraint>-->
+        <!--<web-resource-collection>-->
+            <!--<web-resource-name>main</web-resource-name>-->
+            <!--<url-pattern>/</url-pattern>-->
+        <!--</web-resource-collection>-->
+        <!--<auth-constraint>-->
+            <!--<role-name>*</role-name>-->
+        <!--</auth-constraint>-->
+    <!--</security-constraint>-->
 </web-app>

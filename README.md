@@ -11,8 +11,6 @@ To run this sample locally:
     $ mvn appengine:devserver
 
 ## Deploying
-In the following command, replace YOUR-PROJECT-ID with your
-[Google Cloud Project ID](https://developers.google.com/console/help/new/#projectnumber).
 
     $ mvn appengine:update
 
