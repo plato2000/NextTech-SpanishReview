@@ -1,7 +1,0 @@
-com/nexttech/spanishreview/worksheet/Worksheet.class
-com/nexttech/spanishreview/utils/PrettyPrinter.class
-com/nexttech/spanishreview/worksheet/WorksheetGenerator.class
-com/nexttech/spanishreview/users/UsersServlet.class
-com/nexttech/spanishreview/utils/Utils.class
-com/nexttech/spanishreview/auth/OAuth2Callback.class
-com/nexttech/spanishreview/helloworld/HelloServlet.class
