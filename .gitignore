@@ -1,5 +1,9 @@
 # Google App Engine generated folder
 appengine-generated/
+target/*
+target/
+src/main/webapp/WEB-INF/private_key.json
+
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 

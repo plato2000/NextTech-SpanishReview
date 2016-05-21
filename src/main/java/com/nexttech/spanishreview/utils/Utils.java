@@ -1,13 +1,23 @@
 package com.nexttech.spanishreview.utils;
 
+import com.google.api.client.extensions.appengine.datastore.AppEngineDataStoreFactory;
 import com.google.api.client.extensions.appengine.http.UrlFetchTransport;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.auth.oauth2.*;
+import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.Preconditions;
+import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.blobstore.BlobstoreService;
+import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.tools.cloudstorage.*;
 import com.google.gson.JsonObject;
 
+
+import com.google.api.services.classroom.ClassroomScopes;
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -15,70 +25,94 @@ import java.net.URL;
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
 
+import javax.servlet.http.HttpServletRequest;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+//import java.nio.file.Files;
+//import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Created by plato2000 on 4/23/16.
  */
 public class Utils {
 
-    public static GsonFactory jsonFactory = new GsonFactory();
-    public static HttpTransport transport = new UrlFetchTransport();
+    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+    private static final HttpTransport HTTP_TRANSPORT = new UrlFetchTransport();
+    private static final AppEngineDataStoreFactory DATA_STORE_FACTORY = AppEngineDataStoreFactory.getDefaultInstance();
+    private static final String CLIENT_SECRET_FILE = "WEB-INF/private_key.json";
+    private static final GcsService gcsService = GcsServiceFactory.createGcsService(new RetryParams.Builder()
+            .initialRetryDelayMillis(10)
+            .retryMaxAttempts(10)
+            .totalRetryPeriodMillis(15000)
+            .build());
 
 
-    public static String getHTML(String urlToRead) throws Exception {
-        StringBuilder result = new StringBuilder();
-        URL url = new URL(urlToRead);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String line;
-        while ((line = rd.readLine()) != null) {
-            result.append(line);
+    public static String getRedirectUri(HttpServletRequest req) {
+        GenericUrl url = new GenericUrl(req.getRequestURL().toString());
+        url.setRawPath("/oauth2callback");
+        return url.build();
+    }
+    private static GoogleClientSecrets clientSecrets = null;
+
+    public static GoogleClientSecrets getClientCredential() throws IOException {
+        System.out.println(System.getProperty("user.dir"));
+        if (clientSecrets == null) {
+            clientSecrets = GoogleClientSecrets.load(
+                    JacksonFactory.getDefaultInstance(), new FileReader(CLIENT_SECRET_FILE));
         }
-        rd.close();
-        return result.toString();
+        return clientSecrets;
     }
 
-    public static JSONObject verifyID(String idTokenString) {
-//        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
-//                .setAudience(Arrays.asList("1081294254756-cs889poi4i8qr3bqtc7gv42fhmsccn8g.apps.googleusercontent.com"))
-//                // If you retrieved the token on Android using the Play Services 8.3 API or newer, set
-//                // the issuer to "https://accounts.google.com". Otherwise, set the issuer to
-//                // "accounts.google.com". If you need to verify tokens from multiple sources, build
-//                // a GoogleIdTokenVerifier for each issuer and try them both.
-//                .setIssuer("accounts.google.com")
-//                .build();
+    public static GoogleAuthorizationCodeFlow newFlow() throws IOException {
+        return new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,
+                getClientCredential(), Collections.singleton(ClassroomScopes.CLASSROOM_COURSES_READONLY)).setDataStoreFactory(
+                DATA_STORE_FACTORY).setAccessType("online").build();
+    }
 
-// (Receive idTokenString by HTTPS POST)
+    public static GoogleAuthorizationCodeFlow teacherFlow() throws IOException {
+        ArrayList<String> teacherScopes = new ArrayList<>();
+        teacherScopes.add(ClassroomScopes.CLASSROOM_ROSTERS_READONLY);
+        return new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,
+                getClientCredential(), teacherScopes).setDataStoreFactory(
+                DATA_STORE_FACTORY).setAccessType("offline").build();
+    }
+
+
+//    public static String readFile(String path, Charset encoding)
+//            throws IOException
+//    {
+//        byte[] encoded = Files.readAllBytes(Paths.get(path));
+//        return new String(encoded, encoding);
+//    }
+
+    public static String readFromCloudBucket(String name) {
+        GcsFilename fileName = getFileName(name);
+        GcsInputChannel readChannel = gcsService.openPrefetchingReadChannel(fileName, 0, 2 * 1024 * 1024);
+        ByteBuffer buffer = ByteBuffer.allocate(100);
+        byte[] array = new byte[100];
         try {
-            String returnedStringFromVerification = getHTML("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + idTokenString);
-            System.out.println(returnedStringFromVerification);
-            JSONObject json = (JSONObject)new JSONParser().parse(returnedStringFromVerification);
-            if(json.get("aud").equals("453755821502-1k95kijujmdh4g16opd1qpaqn6miboro.apps.googleusercontent.com")) {
-                if(json.get("iss").equals("accounts.google.com") || json.get("iss").equals("https://accounts.google.com")) {
-//                    System.out.println("exp: " + Long.getLong("12"));
-                    if(Long.parseLong((String) json.get("exp")) >= (System.currentTimeMillis() % 1000)) {
-                        return json;
-                    }
-                }
-            }
-            return null;
-        } catch(Exception e) {
-            e.printStackTrace();
-            return null;
+            readChannel.read(buffer);
+            buffer.get(array);
+            return new String(array, Charset.forName("UTF-8"));
+        } catch(IOException e) {
+            return "";
         }
     }
 
-    public static String readFile(String path, Charset encoding)
-            throws IOException
-    {
-        byte[] encoded = Files.readAllBytes(Paths.get(path));
-        return new String(encoded, encoding);
+
+    private static GcsFilename getFileName(String url) {
+        String[] splits = url.split("/", 4);
+        if (!splits[0].equals("") || !splits[1].equals("gcs")) {
+            throw new IllegalArgumentException("The URL is not formed as expected. " +
+                    "Expecting /gcs/<bucket>/<object>");
+        }
+        return new GcsFilename(splits[2], splits[3]);
     }
 
     public static String array2DToJson(String name, Object[][] array) {

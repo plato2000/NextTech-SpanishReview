@@ -5,29 +5,51 @@ $(function() {
     $(".row").height("100%");
 });
 
-function onSignIn(googleUser) {
-    var profile = googleUser.getBasicProfile();
-    console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-    console.log('Name: ' + profile.getName());
-    console.log('Image URL: ' + profile.getImageUrl());
-    console.log('Email: ' + profile.getEmail());
-    var xhr = new XMLHttpRequest();
-    var id_token = googleUser.getAuthResponse().id_token;
-    console.log("id_token: " + id_token);
-    $.ajax({
-        type: 'POST',
-        url: '/login',
-        dataType: 'json',
-        success: function(data) {
-            console.log(data['sign_in']);
-            if(data['sign_in'] == "false") {
-                signOut();
-                $("#signin-failure").modal();
-            }
-        },
-        data: {"idtoken":id_token},
-        async: true
+
+function start() {
+    gapi.load('auth2', function() {
+        auth2 = gapi.auth2.init({
+            client_id: '453755821502-1k95kijujmdh4g16opd1qpaqn6miboro.apps.googleusercontent.com',
+            // Scopes to request in addition to 'profile' and 'email'
+            scope: 'https://www.googleapis.com/auth/classroom.courses.readonly'
+
+        });
     });
+}
+
+$('#g-signin2').click(function() {
+    // signInCallback defined in step 6.
+    auth2.grantOfflineAccess({'redirect_uri': 'localhost'}).then(signInCallback);
+});
+
+function signInCallback(authResult) {
+    if (authResult['code']) {
+
+        // Hide the sign-in button now that the user is authorized, for example:
+        $('#signinButton').attr('style', 'display: none');
+
+        // Send the code to the server
+        $.ajax({
+            type: 'POST',
+            url: '/login',
+            contentType: 'application/octet-stream; charset=utf-8',
+            success: function(data) {
+                // Handle or verify the server response.
+                if(data['sign_in'] == "false") {
+                    signOut();
+                    $("#signin-failure").modal();
+                } else {
+                    $('#signinButton').attr('style', 'display: none');
+                }
+            },
+            processData: false,
+            data: {"idtoken": authResult['code']}
+        });
+    } else {
+        signOut();
+        $("#signin-failure").modal();
+        // There was an error.
+    }
 }
 
 function signOut() {
@@ -35,7 +57,7 @@ function signOut() {
     auth2.signOut().then(function () {
         console.log('User signed out.');
     });
-    $(".g-signin2").click(function() {
-        //signOut();
-    });
+    //$(".g-signin2").click(function() {
+    //    //signOut();
+    //});
 }

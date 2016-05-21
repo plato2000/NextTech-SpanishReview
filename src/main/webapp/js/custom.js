@@ -57,7 +57,7 @@ function signOut() {
     auth2.signOut().then(function () {
         console.log('User signed out.');
     });
-    $(".g-signin2").click(function() {
-        //signOut();
-    });
+    //$(".g-signin2").click(function() {
+    //    //signOut();
+    //});
 }

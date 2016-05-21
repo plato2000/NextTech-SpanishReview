@@ -8,15 +8,23 @@
         <servlet-class>com.nexttech.spanishreview.helloworld.HelloServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>loginhandler</servlet-name>
-        <servlet-class>com.nexttech.spanishreview.requestthings.LoginHandlerServlet</servlet-class>
+        <servlet-name>users</servlet-name>
+        <servlet-class>com.nexttech.spanishreview.helloworld.UsersServlet</servlet-class>
     </servlet>
-    <servlet-mapping>
-        <servlet-name>loginhandler</servlet-name>
-        <url-pattern>/login</url-pattern>
-    </servlet-mapping>
+    <!--<servlet>-->
+        <!--<servlet-name>loginhandler</servlet-name>-->
+        <!--<servlet-class>com.nexttech.spanishreview.requestthings.LoginHandlerServlet</servlet-class>-->
+    <!--</servlet>-->
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>loginhandler</servlet-name>-->
+        <!--<url-pattern>/login</url-pattern>-->
+    <!--</servlet-mapping>-->
     <servlet-mapping>
         <servlet-name>helloworld</servlet-name>
         <url-pattern>/helloworld</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>users</servlet-name>
+        <url-pattern>/users</url-pattern>
     </servlet-mapping>
 </web-app>

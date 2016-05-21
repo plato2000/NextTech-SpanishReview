@@ -1,6 +1,5 @@
 package com.nexttech.spanishreview.worksheet;
 
-import au.com.bytecode.opencsv.CSVReader;
 import com.nexttech.spanishreview.utils.PrettyPrinter;
 import com.nexttech.spanishreview.utils.Utils;
 import org.json.simple.JSONObject;
@@ -19,28 +18,28 @@ import java.util.*;
  */
 public class WorksheetGenerator {
     private Random random;
-    private String[][] baseWorksheet;
+    private Worksheet baseWorksheet;
 
     public WorksheetGenerator() {
         this.random = new Random();
-        this.baseWorksheet = baseSpanishWorksheet();
+        this.baseWorksheet = new Worksheet(baseSpanishWorksheet());
     }
 
     public WorksheetGenerator(long seed) {
         this.random = new Random(seed);
-        this.baseWorksheet = baseSpanishWorksheet();
+        this.baseWorksheet = new Worksheet(baseSpanishWorksheet());
 
     }
 
     public WorksheetGenerator(Random random, String[][] baseWorksheet) {
         this.random = random;
-        this.baseWorksheet = baseWorksheet;
+        this.baseWorksheet = new Worksheet(baseWorksheet);
 //        this.baseWorksheet = jsonObjectFromPath(pathToJSON);
 //        baseWorksheet.
     }
 
     private String[][] baseSpanishWorksheet() {
-        return kingJSONToStringArray(jsonObjectFromPath("kingWorksheet.json"));
+        return kingJSONToStringArray(jsonObjectFromPath("WEB-INF/kingWorksheet.json"));
 //        try (CSVReader reader = new CSVReader(new BufferedReader(
 //                new FileReader("kingWorksheet.csv")));) {
 //
@@ -59,39 +58,47 @@ public class WorksheetGenerator {
 //        };
     }
 
-    public String[][] getBlankWorksheet() {
-        String[][] blankSheet = new String[this.baseWorksheet.length][];
-        blankSheet[0] = Arrays.copyOf(this.baseWorksheet[0], this.baseWorksheet[0].length);
-        for(int i = 1; i < this.baseWorksheet.length; i++) {
-            blankSheet[i] = new String[this.baseWorksheet[i].length];
-            blankSheet[i][0] = this.baseWorksheet[i][0];
-            for(int j = 1; j < this.baseWorksheet[i].length; j++) {
+    public Worksheet getBlankWorksheet() {
+        String[][] baseWorksheet = this.baseWorksheet.getWorksheet();
+        String[][] blankSheet = new String[baseWorksheet.length][];
+        blankSheet[0] = Arrays.copyOf(baseWorksheet[0], baseWorksheet[0].length);
+        for(int i = 1; i < baseWorksheet.length; i++) {
+            blankSheet[i] = new String[baseWorksheet[i].length];
+            blankSheet[i][0] = baseWorksheet[i][0];
+            for(int j = 1; j < baseWorksheet[i].length - 2; j++) {
                 blankSheet[i][j] = "";
             }
         }
         randomizeSheet(blankSheet);
-        return blankSheet;
+        return new Worksheet(blankSheet);
     }
 
-    public String[][] getRegularWorksheet() {
-        String[][] regularWorksheet = new String[this.baseWorksheet.length][];
-        regularWorksheet[0] = Arrays.copyOf(this.baseWorksheet[0], this.baseWorksheet[0].length);
-        System.out.println(this.baseWorksheet.length);
-        System.out.println(regularWorksheet.length);
-        for(int i = 1; i < this.baseWorksheet.length; i++) {
-            System.out.println(this.baseWorksheet[i]);
-            regularWorksheet[i] = new String[this.baseWorksheet[i].length];
+    public Worksheet getRegularWorksheet() {
+        String[][] baseWorksheet = this.baseWorksheet.getWorksheet();
+        String[][] regularWorksheet = new String[baseWorksheet.length][];
+        regularWorksheet[0] = Arrays.copyOf(baseWorksheet[0], baseWorksheet[0].length);
+//        System.out.println(baseWorksheet.length);
+//        System.out.println(regularWorksheet.length);
+        ArrayList<String> wordBank = new ArrayList<String>();
+        for(int i = 1; i < baseWorksheet.length - 2; i++) {
+            System.out.println(baseWorksheet[i]);
+            regularWorksheet[i] = new String[baseWorksheet[i].length];
             System.out.println(i);
 //            regularWorksheet[i][0] = this.baseWorksheet[i][0];
             int index = this.random.nextInt(regularWorksheet[i].length);
-            regularWorksheet[i][index] = this.baseWorksheet[i][index];
-            for(int j = 0; j < this.baseWorksheet[i].length; j++) {
+            regularWorksheet[i][index] = baseWorksheet[i][index];
+            for(int j = 0; j < baseWorksheet[i].length; j++) {
                 if(j != index) {
                     regularWorksheet[i][j] = "";
+                    wordBank.add(baseWorksheet[i][j]);
                 }
             }
         }
-        return regularWorksheet;
+        for(int i = baseWorksheet.length - 3; i < baseWorksheet.length; i++) {
+            regularWorksheet[i] = Arrays.copyOf(baseWorksheet[i], baseWorksheet[i].length);
+            wordBank.addAll(removeBlanksToWordBank(regularWorksheet[i]));
+        }
+        return new Worksheet(regularWorksheet);
     }
 
 
@@ -103,6 +110,17 @@ public class WorksheetGenerator {
             sheet[index] = sheet[i];
             sheet[i] = a;
         }
+    }
+
+    private ArrayList<String> removeBlanksToWordBank(String[] row) {
+        ArrayList<String> wordBank = new ArrayList<String>();
+        for(int i = 0; i < row.length; i++) {
+            if(row[i].contains("{") && row[i].contains("}")) {
+                wordBank.add(row[i].substring(row[i].indexOf("{"), row[i].indexOf("}")));
+                row[i] = row[i].substring(0, row[i].indexOf("{") + 1) + "BLANK" + row[i].substring(row[i].indexOf("}"));
+            }
+        }
+        return wordBank;
     }
 
     private String[][] kingJSONToStringArray(JSONObject json) {
@@ -168,18 +186,15 @@ public class WorksheetGenerator {
     private JSONObject jsonObjectFromPath(String path) {
         try {
             System.out.println("Current path: " + System.getProperty("user.dir"));
-            String content = Utils.readFile(path, StandardCharsets.UTF_8);
+            String content = Utils.readFromCloudBucket("/gcs/phs-spanishreview/kingWorksheet.json");
             return (JSONObject) new JSONParser().parse(content);
-        } catch(IOException e) {
-            e.printStackTrace();
-            return null;
         } catch (ParseException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public String[][] getBaseWorksheet() {
+    public Worksheet getBaseWorksheet() {
         return this.baseWorksheet;
     }
 
@@ -191,8 +206,8 @@ public class WorksheetGenerator {
 //        System.out.println("length: " + baseWorksheet.length);
 //        p.print(g.getBaseWorksheet());
         System.out.println("Got base worksheet");
-        p.print(g.getRegularWorksheet());
-        System.out.println(Utils.array2DToJson("ws", g.getRegularWorksheet()));
+        p.print(g.getRegularWorksheet().getWorksheet());
+        System.out.println(Utils.array2DToJson("ws", g.getRegularWorksheet().getWorksheet()));
     }
 
 }

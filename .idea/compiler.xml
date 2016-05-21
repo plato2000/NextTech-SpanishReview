@@ -34,7 +34,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="managed-vms-helloworld" target="1.5" />
-      <module name="spanish-review" target="1.8" />
+      <module name="spanish-review" target="1.7" />
     </bytecodeTargetLevel>
   </component>
 </project>

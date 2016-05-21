@@ -16,29 +16,42 @@
 
 package com.nexttech.spanishreview.helloworld;
 
+import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.nexttech.spanishreview.utils.Utils;
 import com.nexttech.spanishreview.worksheet.WorksheetGenerator;
+import com.google.api.client.extensions.appengine.auth.oauth2.AbstractAppEngineAuthorizationCodeServlet;
+
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.annotation.WebServlet;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
-// [START example]
-@WebServlet(name = "helloworld", value = "")
-@SuppressWarnings("serial")
-public class HelloServlet extends HttpServlet {
+public class HelloServlet extends AbstractAppEngineAuthorizationCodeServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         PrintWriter out = resp.getWriter();
         out.println("Hello, world");
-        WorksheetGenerator generator = new WorksheetGenerator();
-        out.println(Utils.array2DToJson("ws", generator.getRegularWorksheet()));
+        try {
+            WorksheetGenerator generator = new WorksheetGenerator();
+            out.println(Utils.array2DToJson("ws", generator.getRegularWorksheet().getWorksheet()));
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @Override
+    protected String getRedirectUri(HttpServletRequest req) throws ServletException, IOException {
+        return Utils.getRedirectUri(req);
+    }
+
+    @Override
+    protected AuthorizationCodeFlow initializeFlow() throws IOException {
+        return Utils.newFlow();
     }
 }
 // [END example]
