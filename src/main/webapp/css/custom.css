@@ -32,13 +32,26 @@ body, html {
 
 
 #worksheet-container {
-    background-color: #FC6E51;
+    /*background-color: #FC6E51;*/
     /*text-align: center;*/
     height:100%;
 }
 
 #wordbank-container {
     height:100%;
-    background-color: #4FC1E9;
+    /*background-color: #4FC1E9;*/
     /*text-align: center;*/
+}
+
+.worksheet-row {
+    line-height: 200px;
+    min-height: 200px;
+    height: 200px;
+}
+.cell {
+    height: 200px;
+}
+
+.table > tbody > tr > td {
+    vertical-align: middle;
 }

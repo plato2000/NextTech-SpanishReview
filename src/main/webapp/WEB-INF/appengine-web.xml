@@ -3,4 +3,8 @@
   <application>phs-spanishreview</application>
   <version>2</version>
   <threadsafe>false</threadsafe>
+  <system-properties>
+    <property name="file.encoding" value="UTF-8" />
+    <property name="DEFAULT_ENCODING" value="UTF-8" />
+  </system-properties>
 </appengine-web-app>

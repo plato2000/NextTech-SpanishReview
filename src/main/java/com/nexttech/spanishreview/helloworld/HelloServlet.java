@@ -17,13 +17,23 @@
 package com.nexttech.spanishreview.helloworld;
 
 import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.services.classroom.Classroom;
+import com.google.api.services.classroom.model.Course;
+import com.google.api.services.classroom.model.ListCoursesResponse;
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.nexttech.spanishreview.utils.Utils;
 import com.nexttech.spanishreview.worksheet.WorksheetGenerator;
 import com.google.api.client.extensions.appengine.auth.oauth2.AbstractAppEngineAuthorizationCodeServlet;
+import org.json.simple.parser.ParseException;
 
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -36,13 +46,37 @@ public class HelloServlet extends AbstractAppEngineAuthorizationCodeServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         PrintWriter out = resp.getWriter();
-        out.println("Hello, world");
+        UserService userService = UserServiceFactory.getUserService();
+        User user = userService.getCurrentUser();
+        out.println(user.getEmail());
+        out.println(userService.createLogoutURL(req.getRequestURL().toString()));
+        System.err.println("Hello, " + userService.getCurrentUser().getEmail());
+//        try {
+//            WorksheetGenerator generator = new WorksheetGenerator();
+//            out.println(Utils.array2DToJson("ws", generator.getRegularWorksheet().getWorksheet()));
+//        } catch(ParseException e) {
+//            e.printStackTrace();
+//        }
+        List<Course> courses = new ArrayList<Course>();
         try {
-            WorksheetGenerator generator = new WorksheetGenerator();
-            out.println(Utils.array2DToJson("ws", generator.getRegularWorksheet().getWorksheet()));
+            Classroom service = Utils.getClassroomService(true);
+            ListCoursesResponse response = service.courses().list()
+                    .setPageSize(10)
+                    .execute();
+            courses = response.getCourses();
         } catch(Exception e) {
             e.printStackTrace();
         }
+        if (courses == null || courses.size() == 0) {
+           out.println("No courses found.");
+        } else {
+            out.println("Courses:");
+            for (Course course : courses) {
+                out.printf("%s\n", course.getName());
+            }
+        }
+
+//        out.println(Classroom.Courses.List.)
     }
     @Override
     protected String getRedirectUri(HttpServletRequest req) throws ServletException, IOException {
@@ -53,5 +87,6 @@ public class HelloServlet extends AbstractAppEngineAuthorizationCodeServlet {
     protected AuthorizationCodeFlow initializeFlow() throws IOException {
         return Utils.newFlow();
     }
+
 }
 // [END example]

@@ -16,6 +16,10 @@
         <jsp-file>/index.jsp</jsp-file>
     </servlet>
     <servlet>
+        <servlet-name>worksheet</servlet-name>
+        <jsp-file>/worksheet.jsp</jsp-file>
+    </servlet>
+    <servlet>
         <servlet-name>helloworld</servlet-name>
         <servlet-class>com.nexttech.spanishreview.helloworld.HelloServlet</servlet-class>
     </servlet>
@@ -28,20 +32,24 @@
         <url-pattern>/users</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>helloworld</servlet-name>
-        <url-pattern>/hello</url-pattern>
+    <servlet-name>helloworld</servlet-name>
+    <url-pattern>/hello</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>worksheet</servlet-name>
+        <url-pattern>/worksheet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>oauth2Callback</servlet-name>
         <url-pattern>/oauth2callback/*</url-pattern>
     </servlet-mapping>
-    <!--<security-constraint>-->
-        <!--<web-resource-collection>-->
-            <!--<web-resource-name>main</web-resource-name>-->
-            <!--<url-pattern>/</url-pattern>-->
-        <!--</web-resource-collection>-->
-        <!--<auth-constraint>-->
-            <!--<role-name>*</role-name>-->
-        <!--</auth-constraint>-->
-    <!--</security-constraint>-->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>main</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>*</role-name>
+        </auth-constraint>
+    </security-constraint>
 </web-app>

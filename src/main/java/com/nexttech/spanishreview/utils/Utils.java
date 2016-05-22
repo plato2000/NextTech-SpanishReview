@@ -1,13 +1,17 @@
 package com.nexttech.spanishreview.utils;
 
+import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.appengine.datastore.AppEngineDataStoreFactory;
 import com.google.api.client.extensions.appengine.http.UrlFetchTransport;
+import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.googleapis.auth.oauth2.*;
+import com.google.api.client.googleapis.extensions.appengine.auth.oauth2.AppIdentityCredential;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Preconditions;
+import com.google.api.services.classroom.Classroom;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
@@ -17,10 +21,8 @@ import com.google.gson.JsonObject;
 
 import com.google.api.services.classroom.ClassroomScopes;
 import com.google.api.services.calendar.CalendarScopes;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+
+import java.io.*;
 import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -50,6 +52,10 @@ public class Utils {
             .retryMaxAttempts(10)
             .totalRetryPeriodMillis(15000)
             .build());
+    private static Collection<String> studentScopes = Arrays.asList(
+            new String[] {ClassroomScopes.CLASSROOM_COURSES_READONLY});
+    private static Collection<String> teacherScopes = Arrays.asList(
+            new String[] {ClassroomScopes.CLASSROOM_ROSTERS_READONLY, "profile", "email"});
 
 
     public static String getRedirectUri(HttpServletRequest req) {
@@ -67,56 +73,49 @@ public class Utils {
         }
         return clientSecrets;
     }
+    public static AppIdentityCredential authorize(boolean student) throws IOException {
+        // Load client secrets.
+//        InputStream in =
+//                Utils.class.getResourceAsStream(CLIENT_SECRET_FILE);
+////        errorPath("");
+////        errorPath("WEB-INF");
+//        System.out.println(in);
+        GoogleClientSecrets clientSecrets = getClientCredential();
+//        System.out.println(in);
+        // Build flow and trigger user authorization request.
+        GoogleAuthorizationCodeFlow flow = newFlow();
+        AppIdentityCredential credential = new AppIdentityCredential(student ? studentScopes : teacherScopes);
+        return credential;
+    }
 
     public static GoogleAuthorizationCodeFlow newFlow() throws IOException {
-        List<String> scope = new ArrayList<String>();
-        scope.add(ClassroomScopes.CLASSROOM_COURSES_READONLY);
+//        List<String> scope = new ArrayList<String>();
+//        scope.add(ClassroomScopes.CLASSROOM_COURSES_READONLY);
+//        scope.add("profile");
+//        scope.add("email");
 //        System.out.println(ClassroomScopes.CLASSROOM_COURSES);
         return new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,
                 getClientCredential(),
-                scope)
+                studentScopes)
                 .setDataStoreFactory(
                 DATA_STORE_FACTORY).setAccessType("online").build();
     }
 
     public static GoogleAuthorizationCodeFlow teacherFlow() throws IOException {
-        ArrayList<String> teacherScopes = new ArrayList<>();
-        teacherScopes.add(ClassroomScopes.CLASSROOM_ROSTERS_READONLY);
+//        ArrayList<String> teacherScopes = new ArrayList<>();
+//        teacherScopes.add(ClassroomScopes.CLASSROOM_ROSTERS_READONLY);
         return new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,
                 getClientCredential(), teacherScopes).setDataStoreFactory(
                 DATA_STORE_FACTORY).setAccessType("offline").build();
     }
 
 
-//    public static String readFile(String path, Charset encoding)
-//            throws IOException
-//    {
-//        byte[] encoded = Files.readAllBytes(Paths.get(path));
-//        return new String(encoded, encoding);
-//    }
-
-    public static String readFromCloudBucket(String name) {
-        GcsFilename fileName = getFileName(name);
-        GcsInputChannel readChannel = gcsService.openPrefetchingReadChannel(fileName, 0, 2 * 1024 * 1024);
-        ByteBuffer buffer = ByteBuffer.allocate(100);
-        byte[] array = new byte[100];
-        try {
-            readChannel.read(buffer);
-            buffer.get(array);
-            return new String(array, Charset.forName("UTF-8"));
-        } catch(IOException e) {
-            return "";
-        }
-    }
-
-
-    private static GcsFilename getFileName(String url) {
-        String[] splits = url.split("/", 4);
-        if (!splits[0].equals("") || !splits[1].equals("gcs")) {
-            throw new IllegalArgumentException("The URL is not formed as expected. " +
-                    "Expecting /gcs/<bucket>/<object>");
-        }
-        return new GcsFilename(splits[2], splits[3]);
+    public static Classroom getClassroomService(boolean student) throws IOException {
+        AppIdentityCredential credential = authorize(student);
+        return new Classroom.Builder(
+                HTTP_TRANSPORT, JSON_FACTORY, credential)
+                .setApplicationName("SpanishReview")
+                .build();
     }
 
     public static String array2DToJson(String name, Object[][] array) {
@@ -137,6 +136,19 @@ public class Utils {
         }
         s.append("\n\t]\n}");
         return s.toString();
+    }
+
+    public static void errorPath(String path) {
+        File folder = new File(path);
+        File[] listOfFiles = folder.listFiles();
+
+        for (int i = 0; i < listOfFiles.length; i++) {
+            if (listOfFiles[i].isFile()) {
+                System.err.println("File " + listOfFiles[i].getName());
+            } else if (listOfFiles[i].isDirectory()) {
+                System.err.println("Directory " + listOfFiles[i].getName());
+            }
+        }
     }
 
 }
