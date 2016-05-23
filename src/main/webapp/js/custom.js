@@ -30,4 +30,47 @@ $(function() {
     document.documentElement.innerHTML = document.documentElement.innerHTML.replace(/�/g, "");
 });
 
+function submitWorksheet() {
+    var csv = getGradableCSV("worksheet-table")
+    if(csv == "") {
+        incompleteForm();
+        return;
+    } else {
+        console.log("csv: " + csv);
+        // TODO: submit logic
+    }
+}
+
+
+function incompleteForm() {
+    // TODO: real stuff for error
+    return;
+}
+
+function getGradableCSV(id) {
+    var csv = "";
+    var table = document.getElementById(id);
+    for (var i = 0, row; row = table.rows[i]; i++) {
+        for (var j = 0, col; col = row.cells[j]; j++) {
+            //iterate through columns
+            //columns would be accessed using the "col" variable assigned in the for loop
+            if(col.hasChildNodes()) {
+                if(col.childNodes[0].hasChildNodes()) {
+                    csv += col.childNodes[0][0].innerHTML + ",";
+                } else {
+                    return "";
+                }
+            } else {
+                if(col.innerText != "") {
+                    csv += col.innerText + ",";
+                } else {
+                    return "";
+                }
+            }
+        }
+        csv += "\n"
+    }
+    return csv;
+}
+
 

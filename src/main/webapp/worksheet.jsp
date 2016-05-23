@@ -35,10 +35,10 @@
     <script src="/js/bootstrap.min.js"></script>
 
     <!-- Google sign in stuff -->
-    <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
-    <meta name="google-signin-client_id" content="453755821502-1k95kijujmdh4g16opd1qpaqn6miboro.apps.googleusercontent.com">
+    <%--<script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>--%>
 </head>
 <body>
+<!-- Top navbar -->
 <div class="navbar navbar-default navbar-fixed-top top">
     <div class="container">
         <div class="navbar-header">
@@ -56,27 +56,26 @@
 
             <ul class="nav navbar-nav navbar-right">
                 <%
+                    // Gets the authentication handler from the Users API
                     UserService userService = UserServiceFactory.getUserService();
                     User user = userService.getCurrentUser();
-//                        user.
-                    if(user == null) {
+                    if(user == null) { // Nobody is logged in
                 %>
-                <li><a href="<%= userService.createLoginURL(request.getRequestURI()) %>">Sign in</a></li>
-                <%--<li><div class="g-signin2" data-onsuccess="onSignIn"></div></li>--%>
+                    <li><a href="<%= userService.createLoginURL(request.getRequestURI()) %>">Sign in</a></li>
                 <%
                 } else {
+                    // Allows functions using the ${} syntax to use variable
                     pageContext.setAttribute("user", user);
-//                            User user = userService.getCurrentUser();
                 %>
-                <%--<li><%userService.createLoginURL(request.getRequestURI());%></li>--%>
                 <li><p class="nav navbar-text">Hi, ${fn:escapeXml(user.nickname)}!</p></li>
                 <li><a href="<%= userService.createLogoutURL(request.getRequestURI()) %>">Sign Out</a></li>
                 <%
                     }
+                    // In case of no MCPS account, opens modal with signout as action for all buttons
                     if(!user.getEmail().substring(user.getEmail().indexOf("@")).equals("@mcpsmd.net")) { %>
                         <script>
                             $(function(){
-                                $('#signin-failure').modal({keyboard:false});
+                                setTimeout(function() {$('#signin-failure').modal({keyboard:false})}, 1000);
                             });
                         </script>
                 <%    }
@@ -92,19 +91,22 @@
 <br />
 <br />
 <br />
+<!-- The main page - worksheet and wordbank -->
 <div class="row">
     <%
         WorksheetGenerator worksheetGenerator = new WorksheetGenerator();
         Worksheet ws;
+        // Gets type of worksheet - blank or standard
         String typeOfWorksheet = request.getParameter("type");
+        // Defaults to standard
         if(typeOfWorksheet == null || typeOfWorksheet.equals("regular")) {
             ws = worksheetGenerator.getRegularWorksheet();
         } else {
             ws = worksheetGenerator.getBlankWorksheet();
         }
+        // Stores things in variables to not have to get a new worksheet every time
         String[][] wsArray = ws.getWorksheet();
         List<String> wordBank = ws.getWordBank();
-//        System.out.println(wordBank.size());
     %>
     <div class="col-sm-8" id="worksheet-container">
         <br />
@@ -112,17 +114,23 @@
         <br />
         <table class="table table-striped table-responsive table-bordered" id="worksheet-table">
             <tr>
-                <% for (String item : wsArray[0]) { %>
+                <%
+                    // Header row
+                    for (String item : wsArray[0]) { %>
                     <th><%=item%></th>
                 <%}%>
             </tr>
-            <% for(int i = 1; i < wsArray.length; i++) {%>
+            <%
+                // Go through every other row in table
+                for(int i = 1; i < wsArray.length; i++) {%>
                 <tr class="worksheet-row">
                     <% for(int j = 0; j < wsArray[i].length; j++) {%>
                         <!-- Makes colspan appropriate for rows that are smaller -->
                         <% if(wsArray[i][j].equals("")) {%>
                             <td class="cell droppable"></td>
-                        <% } else {%>
+                        <% } else {
+                            // Adjusts colspan of cell if it is one of the two cells that have diff colspans
+                        %>
                             <td class="cell" colspan="<%=wsArray[i].length == 3 && j == 2 ? 3 : (wsArray[i].length == 2 && j == 1 ? 4 : 1) %>%>"><%=wsArray[i][j]%></td>
                         <%}
                     }%>
@@ -130,15 +138,19 @@
             <%}%>
         </table>
     </div>
+    <!-- Wordbank -->
     <div class="col-sm-4 right droppable" id="wordbank-container">
         <br />
         <br />
         <br />
-        <% for(String word : wordBank) {%>
+        <% // Goes through every word in wordBank, places them in a well
+            for(String word : wordBank) {%>
             <div class="well"><%=word%></div>
         <%}%>
     </div>
 </div>
+
+<!-- Error modal dialog for signin failures -->
 <div class="modal fade" id="signin-failure" role="dialog">
     <div class="modal-dialog">
 
