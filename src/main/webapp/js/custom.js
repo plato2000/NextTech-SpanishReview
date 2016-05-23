@@ -27,6 +27,7 @@ $(function() {
         //    target.style.padding = "2px 2px 2px 2px";
         //}
     });
+    document.documentElement.innerHTML = document.documentElement.innerHTML.replace(/�/g, "");
 });
 
 

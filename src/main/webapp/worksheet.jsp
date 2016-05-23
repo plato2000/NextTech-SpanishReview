@@ -8,6 +8,7 @@
 <%@ page import="java.util.List" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@page pageEncoding="UTF-8"%>
 
 <html>
 <head>
@@ -72,6 +73,13 @@
                 <li><a href="<%= userService.createLogoutURL(request.getRequestURI()) %>">Sign Out</a></li>
                 <%
                     }
+                    if(!user.getEmail().substring(user.getEmail().indexOf("@")).equals("@mcpsmd.net")) { %>
+                        <script>
+                            $(function(){
+                                $('#signin-failure').modal({keyboard:false});
+                            });
+                        </script>
+                <%    }
                 %>
                 <!--<li><a href="http://builtwithbootstrap.com/" target="_blank">Built With Bootstrap</a></li>-->
                 <!--<li><a href="https://wrapbootstrap.com/?ref=bsw" target="_blank">WrapBootstrap</a></li>-->
@@ -137,14 +145,14 @@
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <a href="<%=userService.createLogoutURL(request.getRequestURI())%>" class="close">&times;</a>
                 <h4 class="modal-title">Could not sign in.</h4>
             </div>
             <div class="modal-body">
                 <p>Sign in failed. Make sure you're signing in with your mcpsmd.net Google account. Your data will not be seen by your teacher unless you do this.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <a href="<%=userService.createLogoutURL(request.getRequestURI())%>" class="btn btn-default">Close</a>
             </div>
         </div>
 
