@@ -4,6 +4,8 @@
 <%@ page import="com.google.appengine.api.users.UserServiceFactory" %>
 <%@ page import="com.nexttech.spanishreview.worksheet.WorksheetGenerator" %>
 <%@ page import="com.nexttech.spanishreview.worksheet.Worksheet" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -17,6 +19,8 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen">
     <link rel="stylesheet" href="/css/custom.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.1/dragula.min.css">
+
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -91,6 +95,8 @@
             ws = worksheetGenerator.getBlankWorksheet();
         }
         String[][] wsArray = ws.getWorksheet();
+        List<String> wordBank = ws.getWordBank();
+//        System.out.println(wordBank.size());
     %>
     <div class="col-sm-8" id="worksheet-container">
         <br />
@@ -105,14 +111,24 @@
             <% for(int i = 1; i < wsArray.length; i++) {%>
                 <tr class="worksheet-row">
                     <% for(int j = 0; j < wsArray[i].length; j++) {%>
-                        <!-- Makes colspan 3 on  -->
+                        <!-- Makes colspan appropriate for rows that are smaller -->
+                        <% if(wsArray[i][j].equals("")) {%>
+                            <td class="cell droppable"></td>
+                        <% } else {%>
                         <td class="cell" colspan="<%=wsArray[i].length == 3 && j == 2 ? 3 : (wsArray[i].length == 2 && j == 1 ? 4 : 1) %>%>"><%=wsArray[i][j]%></td>
-                    <%}%>
+                        <%}
+                    }%>
                 </tr>
             <%}%>
         </table>
     </div>
-    <div class="col-sm-4 right" id="wordbank-container">
+    <div class="col-sm-4 right droppable" id="wordbank-container">
+        <br />
+        <br />
+        <br />
+        <% for(String word : wordBank) {%>
+            <div class="well"><%=word%></div>
+        <%}%>
     </div>
 </div>
 <div class="modal fade" id="signin-failure" role="dialog">
@@ -135,6 +151,7 @@
     </div>
 </div>
 
+<script src='https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.1/dragula.min.js'></script>
 <script src="/js/custom.js"></script>
 
 </body>

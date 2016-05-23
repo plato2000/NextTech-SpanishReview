@@ -43,6 +43,10 @@ body, html {
     /*text-align: center;*/
 }
 
+table {
+    width: 100%;
+}
+
 .worksheet-row {
     line-height: 200px;
     min-height: 200px;
@@ -50,6 +54,7 @@ body, html {
 }
 .cell {
     height: 200px;
+    width: 20%;
 }
 
 .table > tbody > tr > td {

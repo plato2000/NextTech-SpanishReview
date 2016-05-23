@@ -3,61 +3,24 @@
  */
 $(function() {
     $(".row").height("100%");
+    drake = dragula({
+        isContainer: function (el) {
+            return el.classList.contains('droppable');
+        },
+        revertOnSpill: true,
+        accepts: function (el, target, source, sibling) {
+            //console.log((target.innerHTML.match(/<div/g) || []).length);
+            //(target.innerHTML.match(/is/g) || []).length
+            return !target.classList.contains('full') || target.id == "wordbank-container"; // elements can be dropped in any of the `containers` by default
+        }
+    });
+    drake.on("drag", function(e1, source) {
+        source.className = source.className.replace(/\bfull\b/,'');
+    });
+    drake.on("drop", function(e1, target, source, sibling) {
+        console.log(target);
+        target.className += " full";
+    });
 });
 
 
-function start() {
-    gapi.load('auth2', function() {
-        auth2 = gapi.auth2.init({
-            client_id: '453755821502-1k95kijujmdh4g16opd1qpaqn6miboro.apps.googleusercontent.com',
-            // Scopes to request in addition to 'profile' and 'email'
-            scope: 'https://www.googleapis.com/auth/classroom.courses.readonly'
-
-        });
-    });
-}
-
-$('#g-signin2').click(function() {
-    // signInCallback defined in step 6.
-    auth2.grantOfflineAccess({'redirect_uri': 'localhost'}).then(signInCallback);
-});
-
-function signInCallback(authResult) {
-    if (authResult['code']) {
-
-        // Hide the sign-in button now that the user is authorized, for example:
-        $('#signinButton').attr('style', 'display: none');
-
-        // Send the code to the server
-        $.ajax({
-            type: 'POST',
-            url: '/login',
-            contentType: 'application/octet-stream; charset=utf-8',
-            success: function(data) {
-                // Handle or verify the server response.
-                if(data['sign_in'] == "false") {
-                    signOut();
-                    $("#signin-failure").modal();
-                } else {
-                    $('#signinButton').attr('style', 'display: none');
-                }
-            },
-            processData: false,
-            data: {"idtoken": authResult['code']}
-        });
-    } else {
-        signOut();
-        $("#signin-failure").modal();
-        // There was an error.
-    }
-}
-
-function signOut() {
-    var auth2 = gapi.auth2.getAuthInstance();
-    auth2.signOut().then(function () {
-        console.log('User signed out.');
-    });
-    //$(".g-signin2").click(function() {
-    //    //signOut();
-    //});
-}

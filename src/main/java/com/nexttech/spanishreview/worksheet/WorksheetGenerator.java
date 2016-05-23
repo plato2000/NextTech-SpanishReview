@@ -62,15 +62,18 @@ public class WorksheetGenerator {
         String[][] baseWorksheet = this.baseWorksheet.getWorksheet();
         String[][] blankSheet = new String[baseWorksheet.length][];
         blankSheet[0] = Arrays.copyOf(baseWorksheet[0], baseWorksheet[0].length);
+        List<String> wordBank = new ArrayList<>();
         for(int i = 1; i < baseWorksheet.length; i++) {
             blankSheet[i] = new String[baseWorksheet[i].length];
             blankSheet[i][0] = baseWorksheet[i][0];
             for(int j = 1; j < baseWorksheet[i].length - 2; j++) {
                 blankSheet[i][j] = "";
+                wordBank.add(baseWorksheet[i][j]);
             }
         }
         randomizeSheet(blankSheet);
-        return new Worksheet(blankSheet);
+        Collections.shuffle(wordBank);
+        return new Worksheet(blankSheet, wordBank);
     }
 
     public Worksheet getRegularWorksheet() {
@@ -81,9 +84,9 @@ public class WorksheetGenerator {
 //        System.out.println(regularWorksheet.length);
         ArrayList<String> wordBank = new ArrayList<String>();
         for(int i = 1; i < baseWorksheet.length - 2; i++) {
-            System.out.println(baseWorksheet[i]);
+//            System.out.println(baseWorksheet[i]);
             regularWorksheet[i] = new String[baseWorksheet[i].length];
-            System.out.println(i);
+//            System.out.println(i);
 //            regularWorksheet[i][0] = this.baseWorksheet[i][0];
             int index = this.random.nextInt(regularWorksheet[i].length);
             regularWorksheet[i][index] = baseWorksheet[i][index];
@@ -98,7 +101,9 @@ public class WorksheetGenerator {
             regularWorksheet[i] = Arrays.copyOf(baseWorksheet[i], baseWorksheet[i].length);
             wordBank.addAll(removeBlanksToWordBank(regularWorksheet[i]));
         }
-        return new Worksheet(regularWorksheet);
+        randomizeSheet(regularWorksheet);
+        Collections.shuffle(wordBank);
+        return new Worksheet(regularWorksheet, wordBank);
     }
 
 
@@ -116,7 +121,7 @@ public class WorksheetGenerator {
         ArrayList<String> wordBank = new ArrayList<String>();
         for(int i = 0; i < row.length; i++) {
             while(row[i].contains("{") && row[i].contains("}")) {
-                wordBank.add(row[i].substring(row[i].indexOf("{"), row[i].indexOf("}")));
+                wordBank.add(row[i].substring(row[i].indexOf("{") + 1, row[i].indexOf("}")));
                 row[i] = row[i].substring(0, row[i].indexOf("{")) + "[BLANK]" + row[i].substring(row[i].indexOf("}") + 1);
             }
         }
