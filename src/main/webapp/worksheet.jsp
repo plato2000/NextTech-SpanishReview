@@ -102,7 +102,7 @@
         <br />
         <br />
         <br />
-        <table class="table table-striped table-hover table-responsive table-bordered" id="worksheet-table">
+        <table class="table table-striped table-responsive table-bordered" id="worksheet-table">
             <tr>
                 <% for (String item : wsArray[0]) { %>
                     <th><%=item%></th>
@@ -115,7 +115,7 @@
                         <% if(wsArray[i][j].equals("")) {%>
                             <td class="cell droppable"></td>
                         <% } else {%>
-                        <td class="cell" colspan="<%=wsArray[i].length == 3 && j == 2 ? 3 : (wsArray[i].length == 2 && j == 1 ? 4 : 1) %>%>"><%=wsArray[i][j]%></td>
+                            <td class="cell" colspan="<%=wsArray[i].length == 3 && j == 2 ? 3 : (wsArray[i].length == 2 && j == 1 ? 4 : 1) %>%>"><%=wsArray[i][j]%></td>
                         <%}
                     }%>
                 </tr>

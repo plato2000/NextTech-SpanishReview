@@ -122,7 +122,7 @@ public class WorksheetGenerator {
         for(int i = 0; i < row.length; i++) {
             while(row[i].contains("{") && row[i].contains("}")) {
                 wordBank.add(row[i].substring(row[i].indexOf("{") + 1, row[i].indexOf("}")));
-                row[i] = row[i].substring(0, row[i].indexOf("{")) + "[BLANK]" + row[i].substring(row[i].indexOf("}") + 1);
+                row[i] = row[i].substring(0, row[i].indexOf("{")) + "<span class='well inline-droppable droppable'></span>" + row[i].substring(row[i].indexOf("}") + 1);
             }
         }
         return wordBank;

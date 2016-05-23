@@ -16,10 +16,16 @@ $(function() {
     });
     drake.on("drag", function(e1, source) {
         source.className = source.className.replace(/\bfull\b/,'');
+        //if(source.classList.contains('well')) {
+        //    target.style.padding = "";
+        //}
     });
     drake.on("drop", function(e1, target, source, sibling) {
         console.log(target);
         target.className += " full";
+        //if(target.classList.contains('well')) {
+        //    target.style.padding = "2px 2px 2px 2px";
+        //}
     });
 });
 
