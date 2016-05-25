@@ -24,12 +24,16 @@ public class WorksheetGenerator {
 
     /**
      * No-args constructor - uses a standard Random object and uses baseSpanishWorksheet() to get base worksheet
-     * @throws ParseException
      * @throws IOException
      */
-    public WorksheetGenerator() throws ParseException, IOException {
-        this.random = new Random();
-        this.baseWorksheet = new Worksheet(baseSpanishWorksheet());
+    public WorksheetGenerator() throws IOException {
+        try {
+            this.random = new Random();
+            this.baseWorksheet = new Worksheet(baseSpanishWorksheet());
+        } catch(ParseException e) {
+            e.printStackTrace();
+            throw new IOException("The file was wrong");
+        }
     }
 
     /**
@@ -150,7 +154,7 @@ public class WorksheetGenerator {
      * @param row An array of Strings that may have {BLANK}s in them
      * @return
      */
-    private List<String> removeBlanksToWordBank(String[] row) {
+    public static List<String> removeBlanksToWordBank(String[] row) {
         List<String> wordBank = new ArrayList<String>();
         for(int i = 0; i < row.length; i++) {
             // Accounts for multiple blanks in same row
@@ -161,6 +165,7 @@ public class WorksheetGenerator {
                 row[i] = row[i].substring(0, row[i].indexOf("{")) + "<span class='well inline-droppable droppable'></span>" + row[i].substring(row[i].indexOf("}") + 1);
             }
         }
+//        System.out.println(wordBank);
         return wordBank;
     }
 
@@ -223,7 +228,7 @@ public class WorksheetGenerator {
                 kingWorksheet[i][0] = key;
                 for(int j = 1; j < kingWorksheet[0].length; j++) {
                     // Puts in the String representation of the object at [key][j]
-                    kingWorksheet[i][j] = (((JSONObject) json.get(key)).get(kingWorksheet[0][j])).toString();
+                    kingWorksheet[i][j] = (((JSONObject) json.get(key)).get(kingWorksheet[0][j])).toString().replaceAll("\\p{C}", "");
                 }
             } else {
                 // In special case 1 (i == 8)
@@ -231,14 +236,14 @@ public class WorksheetGenerator {
                     kingWorksheet[i] = new String[3];
                     // Specially adds the 3 items in this row
                     kingWorksheet[i][0] = "Command (Imperative)";
-                    kingWorksheet[i][1] = (((JSONObject) json.get(kingWorksheet[i][0])).get("affNeg")).toString();
-                    kingWorksheet[i][2] = (((JSONObject) json.get(kingWorksheet[i][0])).get("allCommands")).toString();
+                    kingWorksheet[i][1] = (((JSONObject) json.get(kingWorksheet[i][0])).get("affNeg")).toString().replaceAll("\\p{C}", "");
+                    kingWorksheet[i][2] = (((JSONObject) json.get(kingWorksheet[i][0])).get("allCommands")).toString().replaceAll("\\p{C}", "");
                 // In special case 2 (i == 9)
                 } else if(i == 9) {
                     kingWorksheet[i] = new String[2];
                     // Specially adds the 2 items to this row
                     kingWorksheet[i][0] = "Subjunctive formula";
-                    kingWorksheet[i][1] = (((JSONObject) json.get(kingWorksheet[i][0])).get("formula")).toString();
+                    kingWorksheet[i][1] = (((JSONObject) json.get(kingWorksheet[i][0])).get("formula")).toString().replaceAll("\\p{C}", "");
                 }
             }
         }

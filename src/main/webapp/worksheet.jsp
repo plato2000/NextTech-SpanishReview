@@ -73,11 +73,11 @@
                     }
                     // In case of no MCPS account, opens modal with signout as action for all buttons
                     if(!user.getEmail().substring(user.getEmail().indexOf("@")).equals("@mcpsmd.net")) { %>
-                        <script>
-                            $(function(){
-                                setTimeout(function() {$('#signin-failure').modal({keyboard:false})}, 1000);
-                            });
-                        </script>
+                        <%--<script>--%>
+                            <%--$(function(){--%>
+                                <%--setTimeout(function() {$('#signin-failure').modal({keyboard:false})}, 1000);--%>
+                            <%--});--%>
+                        <%--</script>--%>
                 <%    }
                 %>
                 <!--<li><a href="http://builtwithbootstrap.com/" target="_blank">Built With Bootstrap</a></li>-->
@@ -130,8 +130,12 @@
                             <td class="cell droppable"></td>
                         <% } else {
                             // Adjusts colspan of cell if it is one of the two cells that have diff colspans
+                            char[] array = wsArray[i][j].toCharArray();
+//                            for(char thing : array) {
+////                                System.out.println(thing + " " + (int) thing);
+//                            }
                         %>
-                            <td class="cell" colspan="<%=wsArray[i].length == 3 && j == 2 ? 3 : (wsArray[i].length == 2 && j == 1 ? 4 : 1) %>%>"><%=wsArray[i][j]%></td>
+                            <td class="cell" colspan="<%=wsArray[i].length == 3 && j == 2 ? 3 : (wsArray[i].length == 2 && j == 1 ? 4 : 1) %>"><%=wsArray[i][j]%></td>
                         <%}
                     }%>
                 </tr>

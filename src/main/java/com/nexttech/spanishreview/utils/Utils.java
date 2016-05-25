@@ -1,6 +1,5 @@
 package com.nexttech.spanishreview.utils;
 
-import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.appengine.datastore.AppEngineDataStoreFactory;
 import com.google.api.client.extensions.appengine.http.UrlFetchTransport;
 import com.google.api.client.googleapis.auth.oauth2.*;
@@ -14,6 +13,8 @@ import com.google.api.services.classroom.Classroom;
 import com.google.appengine.tools.cloudstorage.*;
 
 import com.google.api.services.classroom.ClassroomScopes;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 
 import java.io.*;
 
@@ -54,6 +55,8 @@ public class Utils {
 
     // The variable that holds data from the CLIENT_SECRET_FILE
     private static GoogleClientSecrets clientSecrets = null;
+
+    private static BiMap<String, Integer> wordIDMap = null;
 
     /**
      * Gets the clientSecrets from CLIENT_SECRET_FILE the first time it is called, then just returns clientSecrets
@@ -189,6 +192,80 @@ public class Utils {
                 System.err.println("Directory " + listOfFiles[i].getName());
             }
         }
+    }
+
+    public static BiMap<String, Integer> getIDMap() {
+        if(wordIDMap == null) {
+            wordIDMap = HashBiMap.create(56);
+            wordIDMap.forcePut("&iacute;&emsp;&emsp;&emsp;&emsp;imos<br />iste&emsp;&emsp;&emsp;&emsp;isteis<br />i&oacute;&emsp;&emsp;&emsp;&emsp;ieron", 0);
+            wordIDMap.forcePut("verb conjugated in subjunctive", 1);
+            wordIDMap.forcePut("Translation", 2);
+            wordIDMap.forcePut("&iacute;a&emsp;&emsp;&emsp;&emsp;&iacute;amos<br />&iacute;as&emsp;&emsp;&emsp;&emsp;&iacute;ais<br />&iacute;a&emsp;&emsp;&emsp;&emsp;&iacute;an", 3);
+            wordIDMap.forcePut("&iacute;&emsp;&emsp;&emsp;&emsp;imos<br />iste&emsp;&emsp;&emsp;&emsp;isteis<br />i&oacute;&emsp;&emsp;&emsp;&emsp;ieron", 4);
+            wordIDMap.forcePut("&eacute;&emsp;&emsp;&emsp;&emsp;amos<br />aste&emsp;&emsp;&emsp;&emsp;asteis<br />&oacute;&emsp;&emsp;&emsp;&emsp;aron", 5);
+            wordIDMap.forcePut("he&emsp;&emsp;&emsp;&emsp;hemos<br />has&emsp;&emsp;&emsp;&emsp;hab&eacute;is<br />ha&emsp;&emsp;&emsp;&emsp;han<br />+<br />--IDO", 6);
+            wordIDMap.forcePut("Imperfect", 7);
+            wordIDMap.forcePut("verb, verbs<br />do, does verb<br />am, is, are verbing<br />will verb", 8);
+            wordIDMap.forcePut("ER", 9);
+            wordIDMap.forcePut("infinitive +<br />&iacute;a&emsp;&emsp;&emsp;&emsp;&iacute;amos<br />&iacute;as&emsp;&emsp;&emsp;&emsp;&iacute;ais<br />&iacute;a&emsp;&emsp;&emsp;&emsp;&iacute;an", 10);
+            wordIDMap.forcePut("aba&emsp;&emsp;&emsp;&emsp;&aacute;bamos<br />abas&emsp;&emsp;&emsp;&emsp;abais<br />aba&emsp;&emsp;&emsp;&emsp;aban", 11);
+            wordIDMap.forcePut("IR", 12);
+            wordIDMap.forcePut("Present Progressive", 13);
+            wordIDMap.forcePut("Affirmative t&uacute;", 14);
+            wordIDMap.forcePut("he&emsp;&emsp;&emsp;&emsp;hemos<br />has&emsp;&emsp;&emsp;&emsp;hab&eacute;is<br />ha&emsp;&emsp;&emsp;&emsp;han<br />+<br />--ADO", 15);
+            wordIDMap.forcePut("3s present", 16);
+            wordIDMap.forcePut("r", 17);
+            wordIDMap.forcePut("Preterite", 18);
+            wordIDMap.forcePut("will verb", 19);
+            wordIDMap.forcePut("(negative)", 20);
+            wordIDMap.forcePut("(affirmative)", 21);
+            wordIDMap.forcePut("present subjunctive", 22);
+            wordIDMap.forcePut("yo present, drop \"o\"<br />o&emsp;&emsp;&emsp;&emsp;amos<br />as&emsp;&emsp;&emsp;&emsp;&aacute;is<br />a&emsp;&emsp;&emsp;&emsp;an", 23);
+            wordIDMap.forcePut("d", 24);
+            wordIDMap.forcePut("Tense", 25);
+            wordIDMap.forcePut("Subjunctive formula", 26);
+            wordIDMap.forcePut("used to verb<br />was, were verbing", 27);
+            wordIDMap.forcePut("Conditional", 28);
+            wordIDMap.forcePut("he&emsp;&emsp;&emsp;&emsp;hemos<br />has&emsp;&emsp;&emsp;&emsp;hab&eacute;is<br />ha&emsp;&emsp;&emsp;&emsp;han<br />+<br />--IDO", 29);
+            wordIDMap.forcePut("2nd subject", 30);
+            wordIDMap.forcePut("have, has verbed", 31);
+            wordIDMap.forcePut("subjunctive expression", 32);
+            wordIDMap.forcePut("am, is, are verbing", 33);
+            wordIDMap.forcePut("AR", 34);
+            wordIDMap.forcePut("infinitive", 35);
+            wordIDMap.forcePut("&iacute;a&emsp;&emsp;&emsp;&emsp;&iacute;amos<br />&iacute;as&emsp;&emsp;&emsp;&emsp;&iacute;ais<br />&iacute;a&emsp;&emsp;&emsp;&emsp;&iacute;an", 36);
+            wordIDMap.forcePut("estoy&emsp;&emsp;&emsp;&emsp;estamos<br />est&aacute;s&emsp;&emsp;&emsp;&emsp;est&aacute;is<br />est&aacute;&emsp;&emsp;&emsp;&emsp;est&aacute;n<br />+<br />--IENDO", 37);
+            wordIDMap.forcePut("commands", 38);
+            wordIDMap.forcePut("would verb", 39);
+            wordIDMap.forcePut("verbed<br />did verb", 40);
+            wordIDMap.forcePut("infinitive +<br />&iacute;a&emsp;&emsp;&emsp;&emsp;&iacute;amos<br />&iacute;as&emsp;&emsp;&emsp;&emsp;&iacute;ais<br />&iacute;a&emsp;&emsp;&emsp;&emsp;&iacute;an", 41);
+            wordIDMap.forcePut("Present Subjunctive", 42);
+            wordIDMap.forcePut("Future", 43);
+            wordIDMap.forcePut("infinitive +<br />&eacute;&emsp;&emsp;&emsp;&emsp;emos<br />&aacute;s&emsp;&emsp;&emsp;&emsp;&eacute;is<br />&aacute;&emsp;&emsp;&emsp;&emsp;&aacute;n", 44);
+            wordIDMap.forcePut("yo present, drop \"o\"<br />e&emsp;&emsp;&emsp;&emsp;emos<br />es&emsp;&emsp;&emsp;&emsp;&eacute;is<br />e&emsp;&emsp;&emsp;&emsp;en", 45);
+            wordIDMap.forcePut("Command (Imperative)", 46);
+            wordIDMap.forcePut("yo present, drop \"o\"<br />o&emsp;&emsp;&emsp;&emsp;amos<br />as&emsp;&emsp;&emsp;&emsp;&aacute;is<br />a&emsp;&emsp;&emsp;&emsp;an", 47);
+            wordIDMap.forcePut("Affirmative vosotros", 48);
+            wordIDMap.forcePut("estoy&emsp;&emsp;&emsp;&emsp;estamos<br />est&aacute;s&emsp;&emsp;&emsp;&emsp;est&aacute;is<br />est&aacute;&emsp;&emsp;&emsp;&emsp;est&aacute;n<br />+<br />--IENDO", 49);
+            wordIDMap.forcePut("infinitive +<br />&eacute;&emsp;&emsp;&emsp;&emsp;emos<br />&aacute;s&emsp;&emsp;&emsp;&emsp;&eacute;is<br />&aacute;&emsp;&emsp;&emsp;&emsp;&aacute;n", 50);
+            wordIDMap.forcePut("Present Perfect", 51);
+            wordIDMap.forcePut("estoy&emsp;&emsp;&emsp;&emsp;estamos<br />est&aacute;s&emsp;&emsp;&emsp;&emsp;est&aacute;is<br />est&aacute;&emsp;&emsp;&emsp;&emsp;est&aacute;n<br />+<br />--ANDO", 52);
+            wordIDMap.forcePut("infinitive +<br />&iacute;a&emsp;&emsp;&emsp;&emsp;&iacute;amos<br />&iacute;as&emsp;&emsp;&emsp;&emsp;&iacute;ais<br />&iacute;a&emsp;&emsp;&emsp;&emsp;&iacute;an", 53);
+            wordIDMap.forcePut("infinitive +<br />&eacute;&emsp;&emsp;&emsp;&emsp;emos<br />&aacute;s&emsp;&emsp;&emsp;&emsp;&eacute;is<br />&aacute;&emsp;&emsp;&emsp;&emsp;&aacute;n", 54);
+            wordIDMap.forcePut("1st subject", 55);
+        }
+        return wordIDMap;
+    }
+
+    public static String joinList(List<?> list) {
+        String joined = "";
+        if(list.size() > 0) {
+            joined += list.get(0);
+            for(int i = 1; i < list.size(); i++) {
+                joined += "," + list.get(i).toString();
+            }
+        }
+        return joined;
     }
 
 }

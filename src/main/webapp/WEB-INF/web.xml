@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          version="2.5">
     <servlet>
-        <servlet-name>users</servlet-name>
-        <servlet-class>com.nexttech.spanishreview.users.UsersServlet</servlet-class>
+        <servlet-name>test</servlet-name>
+        <servlet-class>com.nexttech.spanishreview.testing.TestServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>oauth2Callback</servlet-name>
@@ -19,21 +19,14 @@
         <servlet-name>worksheet</servlet-name>
         <jsp-file>/worksheet.jsp</jsp-file>
     </servlet>
-    <servlet>
-        <servlet-name>helloworld</servlet-name>
-        <servlet-class>com.nexttech.spanishreview.helloworld.HelloServlet</servlet-class>
-    </servlet>
+
     <servlet-mapping>
     <servlet-name>main</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>users</servlet-name>
-        <url-pattern>/users</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-    <servlet-name>helloworld</servlet-name>
-    <url-pattern>/hello</url-pattern>
+        <servlet-name>test</servlet-name>
+        <url-pattern>/test</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>worksheet</servlet-name>

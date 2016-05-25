@@ -55,23 +55,29 @@
 
                 <ul class="nav navbar-nav navbar-right">
                     <%
+                        // Gets the authentication handler from the Users API
                         UserService userService = UserServiceFactory.getUserService();
                         User user = userService.getCurrentUser();
-//                        user.
-                        if(user == null) {
+                        if(user == null) { // Nobody is logged in
                     %>
                     <li><a href="<%= userService.createLoginURL(request.getRequestURI()) %>">Sign in</a></li>
-                    <%--<li><div class="g-signin2" data-onsuccess="onSignIn"></div></li>--%>
                     <%
-                        } else {
-                            pageContext.setAttribute("user", user);
-//                            User user = userService.getCurrentUser();
+                    } else {
+                        // Allows functions using the ${} syntax to use variable
+                        pageContext.setAttribute("user", user);
                     %>
-                    <%--<li><%userService.createLoginURL(request.getRequestURI());%></li>--%>
                     <li><p class="nav navbar-text">Hi, ${fn:escapeXml(user.nickname)}!</p></li>
                     <li><a href="<%= userService.createLogoutURL(request.getRequestURI()) %>">Sign Out</a></li>
                     <%
                         }
+                        // In case of no MCPS account, opens modal with signout as action for all buttons
+                        if(!user.getEmail().substring(user.getEmail().indexOf("@")).equals("@mcpsmd.net")) { %>
+                    <script>
+                        $(function(){
+                            setTimeout(function() {$('#signin-failure').modal({keyboard:false})}, 1000);
+                        });
+                    </script>
+                    <%    }
                     %>
                     <!--<li><a href="http://builtwithbootstrap.com/" target="_blank">Built With Bootstrap</a></li>-->
                     <!--<li><a href="https://wrapbootstrap.com/?ref=bsw" target="_blank">WrapBootstrap</a></li>-->
@@ -84,12 +90,6 @@
     <br />
     <br />
     <br />
-    <div class="row">
-        <div class="col-sm-8" id="worksheet-container">
-        </div>
-        <div class="col-sm-4 right" id="wordbank-container">
-        </div>
-    </div>
     <div class="modal fade" id="signin-failure" role="dialog">
         <div class="modal-dialog">
 
