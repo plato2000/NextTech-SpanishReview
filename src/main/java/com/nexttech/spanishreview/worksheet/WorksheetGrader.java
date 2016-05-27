@@ -1,6 +1,7 @@
 package com.nexttech.spanishreview.worksheet;
 
 import com.google.common.collect.BiMap;
+import com.nexttech.spanishreview.utils.PrettyPrinter;
 import com.nexttech.spanishreview.utils.Utils;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -14,6 +15,8 @@ import java.util.List;
 public class WorksheetGrader {
     // The String[][] that contains the answer key in the form of id numbers
     private static String[][] correctWorksheet = null;
+
+    private static final int THRESHOLD_SCORE = 30;
 
     /**
      * If correctWorksheet is null, converts a stringWorksheet from WorksheetGenerator to id number format, using
@@ -35,15 +38,16 @@ public class WorksheetGrader {
 //                    System.out.println(StringUtils.differenceAt(idMap.inverse().get(5), stringWorksheet[i][j]));
 //                    System.out.println(idMap.inverse().get(5).equals(stringWorksheet[i][j]));
                     correctWorksheet[i][j] = idMap.get(stringWorksheet[i][j]).toString();
+//                    System.out.println(correctWorksheet[i][j]);
 //                    System.out.println(idMap.inverse().get(40).equals(stringWorksheet[i][j]));
-                    System.out.print(correctWorksheet[i][j] + " ");
+//                    System.out.print(correctWorksheet[i][j] + " ");
                 }
-                System.out.println();
+//                System.out.println();
             }
             for(int i = stringWorksheet.length - 2; i < stringWorksheet.length; i++) {
                 correctWorksheet[i] = new String[stringWorksheet[i].length];
                 correctWorksheet[i][0] = idMap.get(stringWorksheet[i][0]).toString();
-                System.out.print(correctWorksheet[i][0] + " ");
+//                System.out.print(correctWorksheet[i][0] + " ");
                 for(int j = 1; j < stringWorksheet[i].length; j++) {
                     List<String> currentSpot = WorksheetGenerator.removeBlanksToWordBank(stringWorksheet[i]);
                     List<Integer> currentInt = new ArrayList<Integer>();
@@ -51,11 +55,12 @@ public class WorksheetGrader {
                         currentInt.add(idMap.get(s));
                     }
                     correctWorksheet[i][j] = Utils.joinList(currentInt);
-                    System.out.print(correctWorksheet[i][j] + " ");
+//                    System.out.print(correctWorksheet[i][j] + " ");
                 }
-                System.out.println();
+//                System.out.println();
             }
         }
+//        Utils.printArray(correctWorksheet[0], System.out);
         return correctWorksheet;
     }
 
@@ -71,6 +76,9 @@ public class WorksheetGrader {
     public static int getScore(String[][] origWorksheet, String[][] toBeGraded) {
         try {
             String[][] answerKey = getCorrectKingWorksheet();
+//            PrettyPrinter pr = new PrettyPrinter(System.out);
+//            pr.print(answerKey);
+//            pr.print(toBeGraded);
             // The clauses that have return 0 mean there was tampering somewhere.
             if(origWorksheet.length != toBeGraded.length) {
                 System.out.println("Wrong size");
@@ -81,8 +89,11 @@ public class WorksheetGrader {
 
             // Check header - "Tense", "Translation", "AR", "ER", "IR" expected
             for(int i = 0; i < origWorksheet[0].length; i++) {
-                if(!origWorksheet[0][i].equals(toBeGraded[0][i])) {
+                if(!Utils.getIDMap().get(origWorksheet[0][i]).toString().equals(toBeGraded[0][i])) {
                     System.out.println("Headers are wrong");
+//                    Utils.printArray(origWorksheet[0], System.out);
+//                    Utils.printArray(toBeGraded[0], System.out);
+                    System.out.println(origWorksheet[0][i] + " " + toBeGraded[0][i]);
                     return 0;
                 }
             }
@@ -90,13 +101,18 @@ public class WorksheetGrader {
             // Go through rest of worksheet
             for(int i = 1; i < toBeGraded.length; i++) {
                 if(origWorksheet[i].length != toBeGraded[i].length) {
-                    System.out.println("Wrong size in row " + i);
+                    Utils.printArray(origWorksheet[i], System.out);
+                    Utils.printArray(toBeGraded[i], System.out);
+                    System.out.println("Wrong size in row " + i + " - " + origWorksheet[i].length + " vs. " + toBeGraded[i].length);
                     return 0;
                 }
 
                 // If it is Command form or Subjunctive form row
-                if(origWorksheet[i][0].equals("46") || origWorksheet[i][0].equals("26")) {
-                    if(!origWorksheet[i][0].equals(toBeGraded[i][0])) {
+//                System.out.println(origWorksheet[i][0]);
+//                System.out.println(Utils.getIDMap().get(origWorksheet[i][0]));
+                if(!origWorksheet[i][0].equals("") && (Utils.getIDMap().get(origWorksheet[i][0]).toString().equals("46")
+                        || Utils.getIDMap().get(origWorksheet[i][0]).toString().equals("26"))) {
+                    if(!Utils.getIDMap().get(origWorksheet[i][0]).toString().equals(toBeGraded[i][0])) {
                         System.out.println("The first column of subj. or comm. was wrong at " + i);
                         return 0;
                     }
@@ -104,7 +120,7 @@ public class WorksheetGrader {
                     // Find row in answer key
                     int graderIndex = 0;
                     for(int p = 0; p < answerKey.length; p++) {
-                        if(answerKey[p][0].equals(origWorksheet[i][0])) {
+                        if(answerKey[p][0].equals(Utils.getIDMap().get(origWorksheet[i][0]).toString())) {
                             graderIndex = p;
                             break;
                         }
@@ -125,7 +141,7 @@ public class WorksheetGrader {
                         }
                     }
 
-                    if(!origWorksheet[i][indexOfGiven].equals(toBeGraded[i][indexOfGiven])) {
+                    if(!Utils.getIDMap().get(origWorksheet[i][indexOfGiven]).toString().equals(toBeGraded[i][indexOfGiven])) {
                         System.out.println("Given point was not in place in row " + i);
                         return 0;
                     }
@@ -133,7 +149,7 @@ public class WorksheetGrader {
                     // Find index of answer row for toBeGraded[i]
                     int graderIndex = 0;
                     for(int p = 0; p < answerKey.length; p++) {
-                        if(answerKey[p][indexOfGiven].equals(origWorksheet[i][indexOfGiven])) {
+                        if(answerKey[p][indexOfGiven].equals(Utils.getIDMap().get(origWorksheet[i][indexOfGiven]).toString())) {
                             graderIndex = p;
                             break;
                         }
@@ -155,5 +171,25 @@ public class WorksheetGrader {
             e.printStackTrace();
             return 0;
         }
+    }
+
+
+    /**
+     * Checks if the given String[][] worksheet is blank - if the first element in each row is not blank
+     * @param worksheet A String[][] that represents the worksheet
+     * @return Boolean, true if worksheet is blank template
+     */
+    public static boolean isBlankSheet(String[][] worksheet) {
+        for(String[] row : worksheet) {
+            if(row[0].equals("")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    public static int getThresholdScore() {
+        return THRESHOLD_SCORE;
     }
 }

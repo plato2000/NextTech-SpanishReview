@@ -79,14 +79,19 @@ public class WorksheetGenerator {
         blankSheet[0] = Arrays.copyOf(baseWorksheet[0], baseWorksheet[0].length);
         List<String> wordBank = new ArrayList<>();
         // Goes through each row after the header, puts in the leftmost column, and blanks the rest
-        for(int i = 1; i < baseWorksheet.length; i++) {
+        for(int i = 1; i < baseWorksheet.length - 2; i++) {
             blankSheet[i] = new String[baseWorksheet[i].length];
             blankSheet[i][0] = baseWorksheet[i][0];
-            for(int j = 1; j < baseWorksheet[i].length - 2; j++) {
+            for(int j = 1; j < baseWorksheet[i].length; j++) {
                 blankSheet[i][j] = "";
                 // Adds the things that are blanked to wordbank
                 wordBank.add(baseWorksheet[i][j]);
             }
+        }
+        // Goes through last 2 rows, removes {BLANK}s, and adds them to wordBank
+        for(int i = baseWorksheet.length - 2; i < baseWorksheet.length; i++) {
+            blankSheet[i] = Arrays.copyOf(baseWorksheet[i], baseWorksheet[i].length);
+            wordBank.addAll(removeBlanksToWordBank(blankSheet[i]));
         }
         // Shuffles the worksheet
         randomizeSheet(blankSheet);

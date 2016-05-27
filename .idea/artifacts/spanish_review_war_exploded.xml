@@ -67,7 +67,7 @@
           <element id="library" level="project" name="Maven: com.google.api-client:google-api-client-java6:1.20.0" />
           <element id="library" level="project" name="Maven: com.google.oauth-client:google-oauth-client-java6:1.20.0" />
           <element id="library" level="project" name="Maven: com.google.appengine.tools:appengine-gcs-client:0.6" />
-          <element id="library" level="project" name="Maven: com.google.appengine:appengine-api-1.0-sdk:1.9.37" />
+          <element id="library" level="project" name="Maven: com.google.appengine:appengine-api-1.0-sdk:1.9.38" />
           <element id="library" level="project" name="Maven: joda-time:joda-time:2.3" />
           <element id="library" level="project" name="Maven: com.google.apis:google-api-services-storage:v1-rev68-1.21.0" />
           <element id="library" level="project" name="Maven: com.google.api-client:google-api-client-appengine:1.22.0" />
@@ -84,6 +84,7 @@
           <element id="library" level="project" name="Maven: jstl:jstl:1.2" />
           <element id="library" level="project" name="Maven: com.google.apis:google-api-services-classroom:v1-rev9-1.22.0" />
           <element id="library" level="project" name="Maven: com.google.apis:google-api-services-calendar:v3-rev87-1.19.0" />
+          <element id="library" level="project" name="Maven: com.googlecode.objectify:objectify:5.1.12" />
         </element>
       </element>
       <element id="directory" name="META-INF">

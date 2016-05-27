@@ -6,16 +6,19 @@
 <%@ page import="com.nexttech.spanishreview.worksheet.Worksheet" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
+<%@ page import="static com.googlecode.objectify.ObjectifyService.ofy" %>
+<%@ page import="com.nexttech.spanishreview.utils.Utils" %>
+<%@ page import="com.nexttech.spanishreview.database.MCPSStudent" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page pageEncoding="UTF-8"%>
+<%@page pageEncoding="UTF-8" %>
 
 <html>
 <head>
     <meta charset="utf-8">
     <title>Spanish Review</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen">
@@ -61,24 +64,37 @@
                     User user = userService.getCurrentUser();
                     if(user == null) { // Nobody is logged in
                 %>
-                    <li><a href="<%= userService.createLoginURL(request.getRequestURI()) %>">Sign in</a></li>
+                <li><a href="<%= userService.createLoginURL(request.getRequestURI()) %>">Sign in</a></li>
                 <%
                 } else {
                     // Allows functions using the ${} syntax to use variable
                     pageContext.setAttribute("user", user);
+                    MCPSStudent student = ofy().load().type(MCPSStudent.class).id(user.getEmail().substring(0, user.getEmail().indexOf("@"))).now();
+                    if(student == null) {
+                        System.out.println("Student was null");
+                        student = new MCPSStudent(user.getEmail());
+                        ofy().save().entity(student).now();
+                        System.out.println("Student was added to the database");
+                    } else {
+                        System.out.println("Student was not null, student is " + student.toString());
+                    }
                 %>
                 <li><p class="nav navbar-text">Hi, ${fn:escapeXml(user.nickname)}!</p></li>
                 <li><a href="<%= userService.createLogoutURL(request.getRequestURI()) %>">Sign Out</a></li>
+                <script>
+                    userName = "${user.email}";
+                </script>
                 <%
-                    }
                     // In case of no MCPS account, opens modal with signout as action for all buttons
                     if(!user.getEmail().substring(user.getEmail().indexOf("@")).equals("@mcpsmd.net")) { %>
-                        <%--<script>--%>
-                            <%--$(function(){--%>
-                                <%--setTimeout(function() {$('#signin-failure').modal({keyboard:false})}, 1000);--%>
-                            <%--});--%>
-                        <%--</script>--%>
-                <%    }
+                <script>
+                    $(function () {
+                        setTimeout(function () {
+                            $('#signin-failure').modal({keyboard: false})
+                        }, 1000);
+                    });
+                </script>
+                <% }
                 %>
                 <!--<li><a href="http://builtwithbootstrap.com/" target="_blank">Built With Bootstrap</a></li>-->
                 <!--<li><a href="https://wrapbootstrap.com/?ref=bsw" target="_blank">WrapBootstrap</a></li>-->
@@ -88,69 +104,93 @@
     </div>
 </div>
 
-<br />
-<br />
-<br />
+<br/>
+<br/>
+<br/>
 <!-- The main page - worksheet and wordbank -->
 <div class="row">
     <%
         WorksheetGenerator worksheetGenerator = new WorksheetGenerator();
         Worksheet ws;
         // Gets type of worksheet - blank or standard
-        String typeOfWorksheet = request.getParameter("type");
+        String typeOfWorksheet = "";
+        try {
+            typeOfWorksheet = ((String[]) request.getParameterMap().get("type"))[0];
+        } catch(NullPointerException e) {
+//            e.printStackTrace();
+        }
         // Defaults to standard
-        if(typeOfWorksheet == null || typeOfWorksheet.equals("regular")) {
-            ws = worksheetGenerator.getRegularWorksheet();
-        } else {
+        if(typeOfWorksheet == null || typeOfWorksheet.equals("blank")) {
             ws = worksheetGenerator.getBlankWorksheet();
+        } else {
+            ws = worksheetGenerator.getRegularWorksheet();
         }
         // Stores things in variables to not have to get a new worksheet every time
         String[][] wsArray = ws.getWorksheet();
+        System.out.println("Got worksheet");
+        student.setLastWorksheet(wsArray);
+        System.out.println("Set last worksheet");
+        ofy().save().entity(student);
         List<String> wordBank = ws.getWordBank();
     %>
     <div class="col-sm-8" id="worksheet-container">
-        <br />
-        <br />
-        <br />
+        <br/>
+        <br/>
+        <br/>
         <table class="table table-striped table-responsive table-bordered" id="worksheet-table">
             <tr>
                 <%
                     // Header row
-                    for (String item : wsArray[0]) { %>
-                    <th><%=item%></th>
+                    for(String item : wsArray[0]) { %>
+                <th id="<%=Utils.getIDMap().get(item)%>"><%=item%>
+                </th>
                 <%}%>
             </tr>
             <%
                 // Go through every other row in table
                 for(int i = 1; i < wsArray.length; i++) {%>
-                <tr class="worksheet-row">
-                    <% for(int j = 0; j < wsArray[i].length; j++) {%>
-                        <!-- Makes colspan appropriate for rows that are smaller -->
-                        <% if(wsArray[i][j].equals("")) {%>
-                            <td class="cell droppable"></td>
-                        <% } else {
-                            // Adjusts colspan of cell if it is one of the two cells that have diff colspans
-                            char[] array = wsArray[i][j].toCharArray();
-//                            for(char thing : array) {
-////                                System.out.println(thing + " " + (int) thing);
-//                            }
-                        %>
-                            <td class="cell" colspan="<%=wsArray[i].length == 3 && j == 2 ? 3 : (wsArray[i].length == 2 && j == 1 ? 4 : 1) %>"><%=wsArray[i][j]%></td>
-                        <%}
-                    }%>
-                </tr>
+            <tr class="worksheet-row">
+                <% for(int j = 0; j < wsArray[i].length; j++) {
+                    String id = "";
+                %>
+                <!-- Makes colspan appropriate for rows that are smaller -->
+                <% if(wsArray[i][j].equals("")) {
+                    id = "";
+                %>
+                <td class="cell droppable"></td>
+                <% } else {
+                    try {
+                        id = Utils.getIDMap().get(wsArray[i][j]).toString();
+                    } catch(Exception e) {
+                        id = "";
+                    }
+                %>
+                <td class="cell" id="<%=id%>"
+                    colspan="<%=wsArray[i].length == 3 && j == 2 ? 3 : (wsArray[i].length == 2 && j == 1 ? 4 : 1) %>"><%=wsArray[i][j]%>
+                </td>
+                <%
+                        }
+                    }
+                %>
+            </tr>
             <%}%>
         </table>
     </div>
     <!-- Wordbank -->
     <div class="col-sm-4 right droppable" id="wordbank-container">
-        <br />
-        <br />
-        <br />
+        <br/>
+        <br/>
+        <br/>
         <% // Goes through every word in wordBank, places them in a well
-            for(String word : wordBank) {%>
-            <div class="well"><%=word%></div>
-        <%}%>
+            for(String word : wordBank) {
+                String id = Utils.getIDMap().get(word).toString();
+        %>
+        <div id="<%=id%>" class="well"><%=word%>
+        </div>
+        <%
+                }
+            }
+        %>
     </div>
 </div>
 
@@ -165,7 +205,8 @@
                 <h4 class="modal-title">Could not sign in.</h4>
             </div>
             <div class="modal-body">
-                <p>Sign in failed. Make sure you're signing in with your mcpsmd.net Google account. Your data will not be seen by your teacher unless you do this.</p>
+                <p>Sign in failed. Make sure you're signing in with your mcpsmd.net Google account. Your data will not
+                    be seen by your teacher unless you do this.</p>
             </div>
             <div class="modal-footer">
                 <a href="<%=userService.createLogoutURL(request.getRequestURI())%>" class="btn btn-default">Close</a>
@@ -174,9 +215,28 @@
 
     </div>
 </div>
+<div class="modal fade" id="incomplete-worksheet" tabindex="-1" role="dialog"
+     aria-labelledby="incomplete-worksheet-label">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="incomplete-worksheet-label">Incomplete worksheet!</h4>
+            </div>
+            <div class="modal-body">
+                You tried to submit this worksheet, but it is incomplete. Please finish the worksheet.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src='https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.1/dragula.min.js'></script>
-<script src="/js/custom.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-json/2.5.1/jquery.json.min.js"></script>
+<script src="/js/worksheet.js"></script>
 
 </body>
 </html>

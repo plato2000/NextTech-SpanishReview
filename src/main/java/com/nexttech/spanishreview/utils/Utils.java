@@ -268,4 +268,11 @@ public class Utils {
         return joined;
     }
 
+    public static void printArray(String[] list, PrintStream p) {
+        for(String s : list) {
+            p.print(s + " ");
+        }
+        p.println();
+    }
+
 }

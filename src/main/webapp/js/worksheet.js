@@ -18,16 +18,17 @@ $(function() {
             return !target.classList.contains('full') || target.id == "wordbank-container"; // elements can be dropped in any of the `containers` by default
         }
     });
-    // On drag from place: make it not full
-    drake.on("drag", function(e1, source) {
-        source.className = source.className.replace(/\bfull\b/,'');
-        //if(source.classList.contains('well')) {
-        //    target.style.padding = "";
-        //}
-    });
+    //// On drag from place: make it not full
+    //drake.on("drag", function(e1, source) {
+    //    source.className = source.className.replace(/\bfull\b/,'');
+    //    //if(source.classList.contains('well')) {
+    //    //    target.style.padding = "";
+    //    //}
+    //});
     // On drop in place: make it full
     drake.on("drop", function(e1, target, source, sibling) {
         //console.log(target);
+        source.className = source.className.replace(/\bfull\b/,'');
         target.className += " full";
         //if(target.classList.contains('well')) {
         //    target.style.padding = "2px 2px 2px 2px";
@@ -46,47 +47,81 @@ $(function() {
 
 // Handles submission of worksheet to backend
 function submitWorksheet() {
-    var csv = getGradableCSV("worksheet-table")
-    if(csv == "") {
-        incompleteForm();
+    var array = get2DArray("worksheet-table");
+    if(incompleteForm()) {
         return;
     } else {
-        console.log("csv: " + csv);
-        // TODO: submit logic
+        console.log("array: " + array);
+        var dictToSerialize = {
+            email: userName,
+            ws: array
+        };
+        if (!location.origin)
+            location.origin = location.protocol + "//" + location.host;
+        console.log($.toJSON(dictToSerialize));
+        $.ajax({
+            type: "POST",
+            url: location.origin + "/grader",
+            data: $.toJSON(dictToSerialize),
+            success: function(data) {
+                if(data["success"] == "true") {
+                    window.location.href = location.origin + "/?score=" + data["score"];
+                } else {
+                    $("#submission-failed").modal("show");
+                }
+            }
+        });
     }
 }
 
 // Alerts when submission is tried with an incomplete form
 function incompleteForm() {
-    // TODO: real stuff for error
-    return;
+    //if($("#wordbank-container").find("div.well").length > 0) {
+    //    $("#incomplete-worksheet").modal("show");
+    //    return true;
+    //}
+    return false;
 }
 
-// Converts table to CSV
-function getGradableCSV(id) {
-    var csv = "";
+// Converts table to array
+function get2DArray(id) {
+    var array = [];
     var table = document.getElementById(id);
     for (var i = 0, row; row = table.rows[i]; i++) {
+        array.push([]);
         for (var j = 0, col; col = row.cells[j]; j++) {
             //iterate through columns
             //columns would be accessed using the "col" variable assigned in the for loop
-            if(col.hasChildNodes()) {
-                if(col.childNodes[0].hasChildNodes()) {
-                    csv += col.childNodes[0][0].innerHTML + ",";
+            console.log($(col).find("div"));
+            if($(col).find("div").length > 0) {
+                //console.log($(col).find("div"));
+                if(col.childNodes[0].childNodes[0].id != null) {
+                    array[i].push(col.childNodes[0].childNodes[0].id);
+                    for (var k = 1; k < col.childNodes.length; k++) {
+                        if (col.childNodes[k].hasChildNodes()) {
+                            array[i][j] += "," + col.childNodes[k].childNodes[0].id;
+                        }
+                    }
                 } else {
-                    return "";
+                    array[i].push(col.childNodes[0].id);
                 }
             } else {
-                if(col.innerText != "") {
-                    csv += col.innerText + ",";
+                if(col.id != null) {
+                    array[i].push(col.id);
                 } else {
-                    return "";
+                    array[i].push("");
                 }
             }
         }
-        csv += "\n"
     }
-    return csv;
+    //for(var i = 0; i < array.length; i++) {
+    //    if(array[i][0] == "46") {
+    //        array[i][1] += "," + array[i][2];
+    //        array[i].pop();
+    //        break;
+    //    }
+    //}
+    return array;
 }
 
 

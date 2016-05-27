@@ -139,6 +139,12 @@ Copyright 2015 Google Inc. All Rights Reserved.
             <artifactId>google-api-services-calendar</artifactId>
             <version>v3-rev87-1.19.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.googlecode.objectify</groupId>
+            <artifactId>objectify</artifactId>
+            <version>5.1.12</version>
+        </dependency>
+
     </dependencies>
     <build>
         <!-- for hot reload of the web application -->

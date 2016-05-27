@@ -12,6 +12,10 @@
         <servlet-class>com.nexttech.spanishreview.auth.OAuth2Callback</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>grader</servlet-name>
+        <servlet-class>com.nexttech.spanishreview.worksheet.GraderServlet</servlet-class>
+    </servlet>
+    <servlet>
     <servlet-name>main</servlet-name>
         <jsp-file>/index.jsp</jsp-file>
     </servlet>
@@ -20,13 +24,22 @@
         <jsp-file>/worksheet.jsp</jsp-file>
     </servlet>
 
+    <listener>
+        <listener-class>com.nexttech.spanishreview.utils.SetupListener</listener-class>
+    </listener>
+
+
     <servlet-mapping>
-    <servlet-name>main</servlet-name>
+        <servlet-name>main</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>test</servlet-name>
         <url-pattern>/test</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>grader</servlet-name>
+        <url-pattern>/grader</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>worksheet</servlet-name>
@@ -45,4 +58,12 @@
             <role-name>*</role-name>
         </auth-constraint>
     </security-constraint>
+    <filter>
+        <filter-name>ObjectifyFilter</filter-name>
+        <filter-class>com.googlecode.objectify.ObjectifyFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>ObjectifyFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 </web-app>
