@@ -31,6 +31,7 @@ public class GraderServlet extends HttpServlet {
 
             String email = (String) jsonObject.get("email");
             MCPSStudent student = ofy().load().type(MCPSStudent.class).id(Long.parseLong(email.substring(0, email.indexOf("@")))).now();
+            System.out.println(student);
             String[][] lastWorksheet = student.getLastWorksheet();
 
             if(student == null) {
@@ -66,7 +67,8 @@ public class GraderServlet extends HttpServlet {
                 student.completedBlank();
             }
             student.completedWorksheet();
-            ofy().save().entity(student);
+            student.setLastWorksheet(null);
+            ofy().save().entity(student).now();
             out.println("{ \"success\": \"true\", \"score\": \"" + score + "\" }");
             System.out.println(score);
         } catch(Exception e) {

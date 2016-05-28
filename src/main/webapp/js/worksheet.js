@@ -67,7 +67,8 @@ function submitWorksheet() {
                 if(data["success"] == "true") {
                     window.location.href = location.origin + "/?score=" + data["score"];
                 } else {
-                    $("#submission-failed").modal("show");
+                    console.log(data);
+                    $("#submission-failure").modal("show");
                 }
             }
         });

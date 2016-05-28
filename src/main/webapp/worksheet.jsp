@@ -9,6 +9,7 @@
 <%@ page import="static com.googlecode.objectify.ObjectifyService.ofy" %>
 <%@ page import="com.nexttech.spanishreview.utils.Utils" %>
 <%@ page import="com.nexttech.spanishreview.database.MCPSStudent" %>
+<%@ page import="org.codehaus.plexus.util.StringUtils" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page pageEncoding="UTF-8" %>
@@ -58,35 +59,38 @@
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
+                <li><button onclick="submitWorksheet()" class="btn btn-default">Submit</button></li>
                 <%
                     // Gets the authentication handler from the Users API
                     UserService userService = UserServiceFactory.getUserService();
                     User user = userService.getCurrentUser();
-                    if(user == null) { // Nobody is logged in
-                %>
-                <li><a href="<%= userService.createLoginURL(request.getRequestURI()) %>">Sign in</a></li>
-                <%
-                } else {
+                    if(!StringUtils.isNumeric(user.getEmail().substring(0, user.getEmail().indexOf("@")))
+                            && user.getEmail().substring(user.getEmail().indexOf("@") + 1).equals("mcpsmd.net")){
+                        response.sendRedirect(request.getContextPath() + "/teacher");
+                        return;
+                    }
+                    if(user != null) { // Somebody is logged in
                     // Allows functions using the ${} syntax to use variable
                     pageContext.setAttribute("user", user);
                     MCPSStudent student = ofy().load().type(MCPSStudent.class).id(user.getEmail().substring(0, user.getEmail().indexOf("@"))).now();
+                    pageContext.setAttribute("student", student);
                     if(student == null) {
                         System.out.println("Student was null");
                         student = new MCPSStudent(user.getEmail());
-                        ofy().save().entity(student).now();
+//                        ofy().save().entity(student).now();
                         System.out.println("Student was added to the database");
                     } else {
                         System.out.println("Student was not null, student is " + student.toString());
                     }
                 %>
-                <li><p class="nav navbar-text">Hi, ${fn:escapeXml(user.nickname)}!</p></li>
+                <li><p class="nav navbar-text">Hi, <%=student.getName()%>!</p></li>
                 <li><a href="<%= userService.createLogoutURL(request.getRequestURI()) %>">Sign Out</a></li>
                 <script>
                     userName = "${user.email}";
                 </script>
                 <%
                     // In case of no MCPS account, opens modal with signout as action for all buttons
-                    if(!user.getEmail().substring(user.getEmail().indexOf("@")).equals("@mcpsmd.net")) { %>
+                    if(!user.getEmail().substring(user.getEmail().indexOf("@") + 1).equals("mcpsmd.net")) { %>
                 <script>
                     $(function () {
                         setTimeout(function () {
@@ -94,7 +98,7 @@
                         }, 1000);
                     });
                 </script>
-                <% }
+                <% } else {
                 %>
                 <!--<li><a href="http://builtwithbootstrap.com/" target="_blank">Built With Bootstrap</a></li>-->
                 <!--<li><a href="https://wrapbootstrap.com/?ref=bsw" target="_blank">WrapBootstrap</a></li>-->
@@ -130,7 +134,8 @@
         System.out.println("Got worksheet");
         student.setLastWorksheet(wsArray);
         System.out.println("Set last worksheet");
-        ofy().save().entity(student);
+        ofy().save().entity(student).now();
+        System.out.println(student);
         List<String> wordBank = ws.getWordBank();
     %>
     <div class="col-sm-8" id="worksheet-container">
@@ -190,6 +195,7 @@
         <%
                 }
             }
+            }
         %>
     </div>
 </div>
@@ -233,6 +239,26 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="submission-failure" tabindex="-1" role="dialog"
+     aria-labelledby="submission-failure-label">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="submission-failure-label">Submission failure!</h4>
+            </div>
+            <div class="modal-body">
+                You tried to submit this worksheet, but it didn't go through on the server. If you did nothing wrong, check your internet connection and submit again. If this does not work, please contact your teacher.
+                If you tried to mess with something that caused this issue, please stop.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script src='https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.1/dragula.min.js'></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-json/2.5.1/jquery.json.min.js"></script>

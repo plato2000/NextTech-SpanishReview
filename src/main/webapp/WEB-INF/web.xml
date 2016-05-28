@@ -8,10 +8,6 @@
         <servlet-class>com.nexttech.spanishreview.testing.TestServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>oauth2Callback</servlet-name>
-        <servlet-class>com.nexttech.spanishreview.auth.OAuth2Callback</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>grader</servlet-name>
         <servlet-class>com.nexttech.spanishreview.worksheet.GraderServlet</servlet-class>
     </servlet>
@@ -44,10 +40,6 @@
     <servlet-mapping>
         <servlet-name>worksheet</servlet-name>
         <url-pattern>/worksheet</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>oauth2Callback</servlet-name>
-        <url-pattern>/oauth2callback/*</url-pattern>
     </servlet-mapping>
     <security-constraint>
         <web-resource-collection>

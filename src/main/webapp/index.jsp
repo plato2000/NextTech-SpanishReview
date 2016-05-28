@@ -9,6 +9,10 @@
 <%@ page import="com.google.appengine.api.users.User" %>
 <%@ page import="com.google.appengine.api.users.UserService" %>
 <%@ page import="com.google.appengine.api.users.UserServiceFactory" %>
+<%@ page import="com.nexttech.spanishreview.database.MCPSStudent" %>
+<%@ page import="static com.googlecode.objectify.ObjectifyService.ofy" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="org.codehaus.plexus.util.StringUtils" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <html>
@@ -17,10 +21,9 @@
     <title>Spanish Review</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-
+å
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen">
-    <link rel="stylesheet" href="/css/custom.css">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -32,7 +35,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
     <script src="/js/bootstrap.min.js"></script>
-
     <!-- Google sign in stuff -->
     <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
     <meta name="google-signin-client_id" content="453755821502-1k95kijujmdh4g16opd1qpaqn6miboro.apps.googleusercontent.com">
@@ -41,7 +43,7 @@
     <div class="navbar navbar-default navbar-fixed-top top">
         <div class="container">
             <div class="navbar-header">
-                <a href="../" class="navbar-brand">Spanish Review</a>
+                <a href="/" class="navbar-brand">Spanish Review</a>
                 <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
@@ -58,27 +60,36 @@
                         // Gets the authentication handler from the Users API
                         UserService userService = UserServiceFactory.getUserService();
                         User user = userService.getCurrentUser();
-                        if(user == null) { // Nobody is logged in
-                    %>
-                    <li><a href="<%= userService.createLoginURL(request.getRequestURI()) %>">Sign in</a></li>
-                    <%
-                    } else {
+
+//                        System.out.println(user.getEmail().substring(0, user.getEmail().indexOf("@")));
+//                        System.out.println(StringUtils.isNumeric(user.getEmail().substring(0, user.getEmail().indexOf("@"))));
+//                        System.out.println(user.getEmail().substring(user.getEmail().indexOf("@") + 1));
+                        if(!StringUtils.isNumeric(user.getEmail().substring(0, user.getEmail().indexOf("@")))
+                                && user.getEmail().substring(user.getEmail().indexOf("@") + 1).equals("mcpsmd.net")){
+                            response.sendRedirect(request.getContextPath() + "/teacher");
+                            return;
+                        }
+
                         // Allows functions using the ${} syntax to use variable
                         pageContext.setAttribute("user", user);
                     %>
                     <li><p class="nav navbar-text">Hi, ${fn:escapeXml(user.nickname)}!</p></li>
                     <li><a href="<%= userService.createLogoutURL(request.getRequestURI()) %>">Sign Out</a></li>
                     <%
-                        }
                         // In case of no MCPS account, opens modal with signout as action for all buttons
                         if(!user.getEmail().substring(user.getEmail().indexOf("@")).equals("@mcpsmd.net")) { %>
                     <script>
                         $(function(){
-                            setTimeout(function() {$('#signin-failure').modal({keyboard:false})}, 1000);
+                            setTimeout(function() {$('#signin-failure').appendTo("body").modal({keyboard:false});}, 100);
                         });
                     </script>
-                    <%    }
+                    <%  } else {
                     %>
+                    <script>
+                        $(function(){
+                            setTimeout(function() {$('#normal-modal').appendTo("body").modal({keyboard:false})}, 100);
+                        });
+                    </script>
                     <!--<li><a href="http://builtwithbootstrap.com/" target="_blank">Built With Bootstrap</a></li>-->
                     <!--<li><a href="https://wrapbootstrap.com/?ref=bsw" target="_blank">WrapBootstrap</a></li>-->
                 </ul>
@@ -90,20 +101,98 @@
     <br />
     <br />
     <br />
+
+    <div class="modal fade" id="normal-modal" role="dialog">
+        <div class="modal-dialog">
+            <%
+                System.out.println();
+                MCPSStudent student = ofy().load().type(MCPSStudent.class).id(Long.parseLong(user.getEmail().substring(0, user.getEmail().indexOf("@")))).now();
+                if(student == null) {
+                    student = new MCPSStudent(user.getEmail());
+                    System.out.println("Saving entity in index.jsp too");
+                    ofy().save().entity(student).now();
+                }
+            %>
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Hi, <%=student.getName()%>!</h4>
+                </div>
+                <div class="modal-body">
+                    <%
+                        String score = "";
+                        try {
+                            score = ((String[]) request.getParameterMap().get("score"))[0];
+                        } catch(NullPointerException e) {
+
+                        }
+                        if(!(score == null || score.equals(""))) {
+                    %>
+                    <h1>Score: <%=score%>/40</h1>
+                    <%
+                        }
+                        if(student.getDeadline() > 0) {
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.setTimeInMillis(student.getDeadline());
+
+                            int mYear = calendar.get(Calendar.YEAR);
+                            int mMonth = calendar.get(Calendar.MONTH);
+                            int mDay = calendar.get(Calendar.DAY_OF_MONTH);
+                    %>
+                    <h2>Deadline: <%=mMonth + " " + mDay + " " + mYear%></h2>
+                    <%
+                        }
+                        String overallWorksheets = "Total Worksheets: " + student.getOverallWorksheets() + " completed";
+                        if(student.getRequiredTotal() > 0) {
+                            overallWorksheets += " out of " + student.getRequiredTotal() + " required";
+                        }
+                    %>
+                    <p><%=overallWorksheets%></p>
+                    <%
+                        String blankWorksheets = "Blank Worksheets: " + student.getBlankWorksheets() + " completed";
+                        if(student.getRequiredBlank() > 0) {
+                            blankWorksheets += " out of " + student.getRequiredBlank() + " required";
+                        }
+                    %>
+                    <p><%=blankWorksheets%></p>
+                    <%
+                        String overScore = "Worksheets Over 30/40: " + student.getOverScore() + " completed";
+                        if(student.getRequiredOverScore() > 0) {
+                            overScore += " out of " + student.getOverScore() + " required";
+                        }
+                    %>
+                    <p><%=overScore%></p>
+
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-default" href="javascript:blankSheet()">Blank Worksheet</a>
+                    <a class="btn btn-default" href="javascript:normalSheet()">Normal Worksheet</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <%
+        }
+    %>
+
+    <!-- Error modal dialog for signin failures -->
     <div class="modal fade" id="signin-failure" role="dialog">
         <div class="modal-dialog">
 
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <a href="<%=userService.createLogoutURL(request.getRequestURI())%>" class="close">&times;</a>
                     <h4 class="modal-title">Could not sign in.</h4>
                 </div>
                 <div class="modal-body">
-                    <p>Sign in failed. Make sure you're signing in with your mcpsmd.net Google account. Your data will not be seen by your teacher unless you do this.</p>
+                    <p>Sign in failed. Make sure you're signing in with your mcpsmd.net Google account. Your data will not
+                        be seen by your teacher unless you do this.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <a href="<%=userService.createLogoutURL(request.getRequestURI())%>" class="btn btn-default">Close</a>
                 </div>
             </div>
 
