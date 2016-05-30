@@ -141,7 +141,7 @@
                             int mMonth = calendar.get(Calendar.MONTH);
                             int mDay = calendar.get(Calendar.DAY_OF_MONTH);
                     %>
-                    <h2>Deadline: <%=mMonth + " " + mDay + " " + mYear%></h2>
+                    <h2>Deadline: <%=mMonth + "/" + mDay + "/" + mYear%></h2>
                     <%
                         }
                         if(!student.getTeacher().equals("")) {
@@ -165,7 +165,7 @@
                     <%
                         String overScore = "Worksheets Over " + WorksheetGrader.getThresholdScore() + "/40: " + student.getOverScore() + " completed";
                         if(!student.getTeacher().equals("")) {
-                            overScore += " out of " + student.getOverScore() + " required";
+                            overScore += " out of " + student.getRequiredOverScore() + " required";
                         }
                     %>
                     <p><%=overScore%></p>
