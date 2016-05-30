@@ -90,38 +90,30 @@ function get2DArray(id) {
     var table = document.getElementById(id);
     for (var i = 0, row; row = table.rows[i]; i++) {
         array.push([]);
-        for (var j = 0, col; col = row.cells[j]; j++) {
+        for (var j = 0, cell; cell = row.cells[j]; j++) {
             //iterate through columns
-            //columns would be accessed using the "col" variable assigned in the for loop
-            //console.log($(col).find("div"));
-            if($(col).find("div").length > 0) {
-                //console.log($(col).find("div"));
-                if(col.childNodes[0].hasChildNodes() && col.childNodes[0].childNodes[0].id != null) {
-                    array[i].push(col.childNodes[0].childNodes[0].id);
-                    for (var k = 1; k < col.childNodes.length; k++) {
-                        if (col.childNodes[k].hasChildNodes()) {
-                            array[i][j] += "," + col.childNodes[k].childNodes[0].id;
-                        }
+            //columns would be accessed using the "cell" variable assigned in the for loop
+            //console.log($(cell).find("div"));
+            if($(cell).find("div").length > 0) {
+                //console.log($(cell).find("div"));
+                if($(cell).find("div").length > 1) {
+                    array[i].push($(cell).find("div")[0].id);
+                    for (var k = 1; k < $(cell).find("div").length; k++) {
+                        array[i][j] += "," + $(cell).find("div")[k].id;
                     }
                 } else {
-                    array[i].push(col.childNodes[0].id);
+                    array[i].push($(cell).find("div")[0].id);
                 }
             } else {
-                if(col.id != null) {
-                    array[i].push(col.id);
+                if(cell.id != null) {
+                    array[i].push(cell.id);
                 } else {
                     array[i].push("");
                 }
             }
         }
     }
-    //for(var i = 0; i < array.length; i++) {
-    //    if(array[i][0] == "46") {
-    //        array[i][1] += "," + array[i][2];
-    //        array[i].pop();
-    //        break;
-    //    }
-    //}
+
     return array;
 }
 
