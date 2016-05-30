@@ -17,7 +17,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Spanish Review</title>
+    <title>Spanish Review - Worksheet</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 
@@ -38,8 +38,6 @@
 
     <script src="/js/bootstrap.min.js"></script>
 
-    <!-- Google sign in stuff -->
-    <%--<script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>--%>
 </head>
 <body>
 <!-- Top navbar -->
@@ -59,29 +57,31 @@
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li><button onclick="submitWorksheet()" class="btn btn-default">Submit</button></li>
+                <li>
+                    <button onclick="submitWorksheet()" class="btn btn-default">Submit</button>
+                </li>
                 <%
                     // Gets the authentication handler from the Users API
                     UserService userService = UserServiceFactory.getUserService();
                     User user = userService.getCurrentUser();
-                    if(!StringUtils.isNumeric(user.getEmail().substring(0, user.getEmail().indexOf("@")))
-                            && user.getEmail().substring(user.getEmail().indexOf("@") + 1).equals("mcpsmd.net")){
-                        response.sendRedirect(request.getContextPath() + "/teacher");
+                    if(userService.isUserAdmin() || !StringUtils.isNumeric(user.getEmail().substring(0, user.getEmail().indexOf("@")))
+                            && user.getEmail().substring(user.getEmail().indexOf("@") + 1).equals("mcpsmd.net")) {
+                        response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + "/teacher"));
                         return;
                     }
                     if(user != null) { // Somebody is logged in
-                    // Allows functions using the ${} syntax to use variable
-                    pageContext.setAttribute("user", user);
-                    MCPSStudent student = ofy().load().type(MCPSStudent.class).id(user.getEmail().substring(0, user.getEmail().indexOf("@"))).now();
-                    pageContext.setAttribute("student", student);
-                    if(student == null) {
-                        System.out.println("Student was null");
-                        student = new MCPSStudent(user.getEmail());
+                        // Allows functions using the ${} syntax to use variable
+                        pageContext.setAttribute("user", user);
+                        MCPSStudent student = ofy().load().type(MCPSStudent.class).id(user.getEmail().substring(0, user.getEmail().indexOf("@"))).now();
+                        pageContext.setAttribute("student", student);
+                        if(student == null) {
+                            System.out.println("Student was null");
+                            student = new MCPSStudent(user.getEmail());
 //                        ofy().save().entity(student).now();
-                        System.out.println("Student was added to the database");
-                    } else {
-                        System.out.println("Student was not null, student is " + student.toString());
-                    }
+                            System.out.println("Student was added to the database");
+                        } else {
+                            System.out.println("Student was not null, student is " + student.toString());
+                        }
                 %>
                 <li><p class="nav navbar-text">Hi, <%=student.getName()%>!</p></li>
                 <li><a href="<%= userService.createLogoutURL(request.getRequestURI()) %>">Sign Out</a></li>
@@ -100,8 +100,6 @@
                 </script>
                 <% } else {
                 %>
-                <!--<li><a href="http://builtwithbootstrap.com/" target="_blank">Built With Bootstrap</a></li>-->
-                <!--<li><a href="https://wrapbootstrap.com/?ref=bsw" target="_blank">WrapBootstrap</a></li>-->
             </ul>
 
         </div>
@@ -135,7 +133,7 @@
         student.setLastWorksheet(wsArray);
         System.out.println("Set last worksheet");
         ofy().save().entity(student).now();
-        System.out.println(student);
+        System.out.println("Saved student");
         List<String> wordBank = ws.getWordBank();
     %>
     <div class="col-sm-8" id="worksheet-container">
@@ -146,6 +144,7 @@
             <tr>
                 <%
                     // Header row
+                    System.out.println("Reached table loop");
                     for(String item : wsArray[0]) { %>
                 <th id="<%=Utils.getIDMap().get(item)%>"><%=item%>
                 </th>
@@ -187,15 +186,18 @@
         <br/>
         <br/>
         <% // Goes through every word in wordBank, places them in a well
+            System.out.println("Reached word bank loop");
             for(String word : wordBank) {
-                String id = Utils.getIDMap().get(word).toString();
+                System.out.println(word);
+                String id = Utils.getIDMap().get(word.replaceAll("\\p{C}", "").replaceAll("[^\\x00-\\x7F]", "")).toString();
         %>
         <div id="<%=id%>" class="well"><%=word%>
         </div>
         <%
+                    }
                 }
             }
-            }
+            System.out.println("Reached very end");
         %>
     </div>
 </div>
@@ -221,6 +223,9 @@
 
     </div>
 </div>
+<%
+    System.out.println("Reached absolute end");
+%>
 <div class="modal fade" id="incomplete-worksheet" tabindex="-1" role="dialog"
      aria-labelledby="incomplete-worksheet-label">
     <div class="modal-dialog" role="document">
@@ -249,7 +254,8 @@
                 <h4 class="modal-title" id="submission-failure-label">Submission failure!</h4>
             </div>
             <div class="modal-body">
-                You tried to submit this worksheet, but it didn't go through on the server. If you did nothing wrong, check your internet connection and submit again. If this does not work, please contact your teacher.
+                You tried to submit this worksheet, but it didn't go through on the server. If you did nothing wrong,
+                check your internet connection and submit again. If this does not work, please contact your teacher.
                 If you tried to mess with something that caused this issue, please stop.
             </div>
             <div class="modal-footer">
@@ -261,7 +267,8 @@
 
 
 <script src='https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.1/dragula.min.js'></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-json/2.5.1/jquery.json.min.js"></script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/jquery-json/2.5.1/jquery.json.min.js"></script>
 <script src="/js/worksheet.js"></script>
 
 </body>

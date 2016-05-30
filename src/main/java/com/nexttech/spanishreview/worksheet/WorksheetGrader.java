@@ -1,9 +1,7 @@
 package com.nexttech.spanishreview.worksheet;
 
 import com.google.common.collect.BiMap;
-import com.nexttech.spanishreview.utils.PrettyPrinter;
 import com.nexttech.spanishreview.utils.Utils;
-import org.codehaus.plexus.util.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -186,6 +184,17 @@ public class WorksheetGrader {
             }
         }
         return true;
+    }
+
+    public static boolean hasBlanksInSheet(String[][] worksheet) {
+        for(String[] row : worksheet) {
+            for(String s : row) {
+                if(s.equals("")) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 

@@ -13,6 +13,7 @@
 <%@ page import="static com.googlecode.objectify.ObjectifyService.ofy" %>
 <%@ page import="java.util.Calendar" %>
 <%@ page import="org.codehaus.plexus.util.StringUtils" %>
+<%@ page import="com.nexttech.spanishreview.worksheet.WorksheetGrader" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <html>
@@ -21,7 +22,6 @@
     <title>Spanish Review</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-å
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen">
 
@@ -36,8 +36,8 @@
 
     <script src="/js/bootstrap.min.js"></script>
     <!-- Google sign in stuff -->
-    <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
-    <meta name="google-signin-client_id" content="453755821502-1k95kijujmdh4g16opd1qpaqn6miboro.apps.googleusercontent.com">
+    <%--<script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>--%>
+    <%--<meta name="google-signin-client_id" content="453755821502-1k95kijujmdh4g16opd1qpaqn6miboro.apps.googleusercontent.com">--%>
 </head>
 <body>
     <div class="navbar navbar-default navbar-fixed-top top">
@@ -61,19 +61,28 @@
                         UserService userService = UserServiceFactory.getUserService();
                         User user = userService.getCurrentUser();
 
-//                        System.out.println(user.getEmail().substring(0, user.getEmail().indexOf("@")));
-//                        System.out.println(StringUtils.isNumeric(user.getEmail().substring(0, user.getEmail().indexOf("@"))));
-//                        System.out.println(user.getEmail().substring(user.getEmail().indexOf("@") + 1));
-                        if(!StringUtils.isNumeric(user.getEmail().substring(0, user.getEmail().indexOf("@")))
+                        System.out.println(user.getEmail().substring(0, user.getEmail().indexOf("@")));
+                        System.out.println(StringUtils.isNumeric(user.getEmail().substring(0, user.getEmail().indexOf("@"))));
+                        System.out.println(user.getEmail().substring(user.getEmail().indexOf("@") + 1));
+                        if(userService.isUserAdmin() || !StringUtils.isNumeric(user.getEmail().substring(0, user.getEmail().indexOf("@")))
                                 && user.getEmail().substring(user.getEmail().indexOf("@") + 1).equals("mcpsmd.net")){
-                            response.sendRedirect(request.getContextPath() + "/teacher");
+                            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + "/teacher"));
+//                            response.sendRedirect(response.encodeRedirectURL(userService.createLogoutURL(request.getRequestURI())));
                             return;
+                        }
+
+                        System.out.println();
+                        MCPSStudent student = ofy().load().type(MCPSStudent.class).id(Long.parseLong(user.getEmail().substring(0, user.getEmail().indexOf("@")))).now();
+                        if(student == null) {
+                            student = new MCPSStudent(user.getEmail());
+                            System.out.println("Saving entity in index.jsp too");
+                            ofy().save().entity(student).now();
                         }
 
                         // Allows functions using the ${} syntax to use variable
                         pageContext.setAttribute("user", user);
                     %>
-                    <li><p class="nav navbar-text">Hi, ${fn:escapeXml(user.nickname)}!</p></li>
+                    <li><p class="nav navbar-text">Hi, <%=student.getName()%>!</p></li>
                     <li><a href="<%= userService.createLogoutURL(request.getRequestURI()) %>">Sign Out</a></li>
                     <%
                         // In case of no MCPS account, opens modal with signout as action for all buttons
@@ -104,15 +113,7 @@
 
     <div class="modal fade" id="normal-modal" role="dialog">
         <div class="modal-dialog">
-            <%
-                System.out.println();
-                MCPSStudent student = ofy().load().type(MCPSStudent.class).id(Long.parseLong(user.getEmail().substring(0, user.getEmail().indexOf("@")))).now();
-                if(student == null) {
-                    student = new MCPSStudent(user.getEmail());
-                    System.out.println("Saving entity in index.jsp too");
-                    ofy().save().entity(student).now();
-                }
-            %>
+
 
             <!-- Modal content-->
             <div class="modal-content">
@@ -143,22 +144,27 @@
                     <h2>Deadline: <%=mMonth + " " + mDay + " " + mYear%></h2>
                     <%
                         }
+                        if(!student.getTeacher().equals("")) {
+                    %>
+                    <h2>Teacher: <%=student.getTeacher()%></h2>
+                    <%
+                        }
                         String overallWorksheets = "Total Worksheets: " + student.getOverallWorksheets() + " completed";
-                        if(student.getRequiredTotal() > 0) {
+                        if(!student.getTeacher().equals("")) {
                             overallWorksheets += " out of " + student.getRequiredTotal() + " required";
                         }
                     %>
                     <p><%=overallWorksheets%></p>
                     <%
                         String blankWorksheets = "Blank Worksheets: " + student.getBlankWorksheets() + " completed";
-                        if(student.getRequiredBlank() > 0) {
+                        if(!student.getTeacher().equals("")) {
                             blankWorksheets += " out of " + student.getRequiredBlank() + " required";
                         }
                     %>
                     <p><%=blankWorksheets%></p>
                     <%
-                        String overScore = "Worksheets Over 30/40: " + student.getOverScore() + " completed";
-                        if(student.getRequiredOverScore() > 0) {
+                        String overScore = "Worksheets Over " + WorksheetGrader.getThresholdScore() + "/40: " + student.getOverScore() + " completed";
+                        if(!student.getTeacher().equals("")) {
                             overScore += " out of " + student.getOverScore() + " required";
                         }
                     %>

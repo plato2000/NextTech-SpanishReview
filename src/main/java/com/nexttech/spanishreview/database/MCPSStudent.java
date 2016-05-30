@@ -1,11 +1,10 @@
 package com.nexttech.spanishreview.database;
 
 import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.*;
+import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Serialize;
 
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by plato2000 on 5/25/16.
@@ -47,13 +46,17 @@ public class MCPSStudent {
      */
     private MCPSStudent() {}
 
+    public MCPSStudent(long id) {
+        this(id + "@mcpsmd.net");
+    }
+
     /**
      * The basic constructor, makes a user with dummy fields except for ID and emailAddress. Used when student logs in
      * before teacher sets stuff up.
      * @param emailAddress The MCPS email address of the student
      */
     public MCPSStudent(String emailAddress) {
-        this(emailAddress, emailAddress, 0, "", 0, 0, 0);
+        this(emailAddress, emailAddress, 0, "", 5, 3, 1);
     }
 
     /**
@@ -62,7 +65,7 @@ public class MCPSStudent {
      * @param deadline The deadline time for the student to complete work by
      * @param teacher The name/email of the teacher
      */
-    public MCPSStudent(String emailAddress, String name, long deadline, String teacher, int overallWorksheets, int requiredOverScore, int totalBlank) {
+    public MCPSStudent(String emailAddress, String name, long deadline, String teacher, int requiredTotal, int requiredOverScore, int totalBlank) {
         this.emailAddress = emailAddress;
         this.deadline = deadline;
         this.teacher = teacher;
@@ -76,7 +79,7 @@ public class MCPSStudent {
 
         this.name = name;
 
-        this.overallWorksheets = overallWorksheets;
+        this.requiredTotal = requiredTotal;
         this.requiredOverScore = requiredOverScore;
         this.requiredBlank = totalBlank;
 //        this.initTime = Calendar.getInstance().getTimeInMillis();
@@ -177,6 +180,21 @@ public class MCPSStudent {
         for(int i = 0; i < worksheet.length; i++) {
             this.lastWorksheet[i] = Arrays.copyOf(worksheet[i], worksheet[i].length);
         }
+    }
+
+    public boolean metRequirements() {
+        if(getOverallWorksheets() >= getRequiredTotal()) {
+            if(getBlankWorksheets() >= getRequiredBlank()) {
+                if(getOverScore() >= getRequiredOverScore()) {
+                    return true;
+                }
+            }
+         }
+        return false;
+    }
+
+    public boolean started() {
+        return getOverallWorksheets() > 0;
     }
 
     @Override

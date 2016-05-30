@@ -49,9 +49,9 @@ $(function() {
 function submitWorksheet() {
     var array = get2DArray("worksheet-table");
     if(incompleteForm()) {
-        return;
+
     } else {
-        console.log("array: " + array);
+        //console.log("array: " + array);
         var dictToSerialize = {
             email: userName,
             ws: array
@@ -77,10 +77,10 @@ function submitWorksheet() {
 
 // Alerts when submission is tried with an incomplete form
 function incompleteForm() {
-    //if($("#wordbank-container").find("div.well").length > 0) {
-    //    $("#incomplete-worksheet").modal("show");
-    //    return true;
-    //}
+    if($("#wordbank-container").find("div.well").length > 0) {
+        $("#incomplete-worksheet").modal("show");
+        return true;
+    }
     return false;
 }
 
@@ -93,10 +93,10 @@ function get2DArray(id) {
         for (var j = 0, col; col = row.cells[j]; j++) {
             //iterate through columns
             //columns would be accessed using the "col" variable assigned in the for loop
-            console.log($(col).find("div"));
+            //console.log($(col).find("div"));
             if($(col).find("div").length > 0) {
                 //console.log($(col).find("div"));
-                if(col.childNodes[0].childNodes[0].id != null) {
+                if(col.childNodes[0].hasChildNodes() && col.childNodes[0].childNodes[0].id != null) {
                     array[i].push(col.childNodes[0].childNodes[0].id);
                     for (var k = 1; k < col.childNodes.length; k++) {
                         if (col.childNodes[k].hasChildNodes()) {

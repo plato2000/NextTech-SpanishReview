@@ -1,16 +1,12 @@
 package com.nexttech.spanishreview.worksheet;
 
-import com.nexttech.spanishreview.utils.PrettyPrinter;
-import com.nexttech.spanishreview.utils.Utils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -233,7 +229,7 @@ public class WorksheetGenerator {
                 kingWorksheet[i][0] = key;
                 for(int j = 1; j < kingWorksheet[0].length; j++) {
                     // Puts in the String representation of the object at [key][j]
-                    kingWorksheet[i][j] = (((JSONObject) json.get(key)).get(kingWorksheet[0][j])).toString().replaceAll("\\p{C}", "");
+                    kingWorksheet[i][j] = (((JSONObject) json.get(key)).get(kingWorksheet[0][j])).toString().replaceAll("\\p{C}", "").replaceAll("[^\\x00-\\x7F]", "");
                 }
             } else {
                 // In special case 1 (i == 8)
@@ -241,14 +237,14 @@ public class WorksheetGenerator {
                     kingWorksheet[i] = new String[3];
                     // Specially adds the 3 items in this row
                     kingWorksheet[i][0] = "Command (Imperative)";
-                    kingWorksheet[i][1] = (((JSONObject) json.get(kingWorksheet[i][0])).get("affNeg")).toString().replaceAll("\\p{C}", "");
-                    kingWorksheet[i][2] = (((JSONObject) json.get(kingWorksheet[i][0])).get("allCommands")).toString().replaceAll("\\p{C}", "");
+                    kingWorksheet[i][1] = (((JSONObject) json.get(kingWorksheet[i][0])).get("affNeg")).toString().replaceAll("\\p{C}", "").replaceAll("[^\\x00-\\x7F]", "");
+                    kingWorksheet[i][2] = (((JSONObject) json.get(kingWorksheet[i][0])).get("allCommands")).toString().replaceAll("\\p{C}", "").replaceAll("[^\\x00-\\x7F]", "");
                 // In special case 2 (i == 9)
                 } else if(i == 9) {
                     kingWorksheet[i] = new String[2];
                     // Specially adds the 2 items to this row
                     kingWorksheet[i][0] = "Subjunctive formula";
-                    kingWorksheet[i][1] = (((JSONObject) json.get(kingWorksheet[i][0])).get("formula")).toString().replaceAll("\\p{C}", "");
+                    kingWorksheet[i][1] = (((JSONObject) json.get(kingWorksheet[i][0])).get("formula")).toString().replaceAll("\\p{C}", "").replaceAll("[^\\x00-\\x7F]", "");
                 }
             }
         }

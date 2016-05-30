@@ -4,7 +4,6 @@ import com.nexttech.spanishreview.database.MCPSStudent;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -60,15 +59,23 @@ public class GraderServlet extends HttpServlet {
             }
 
             int score = WorksheetGrader.getScore(student.getLastWorksheet(), toBeGraded);
-            if(score > WorksheetGrader.getThresholdScore()) {
-                student.completedOverScore();
+            boolean hasBlanks = WorksheetGrader.hasBlanksInSheet(toBeGraded);
+            // If worksheet has blanks or deadline is set and it is past that deadline, don't give credit (still report score)
+            if(!hasBlanks && (System.currentTimeMillis() <= student.getDeadline() || student.getDeadline() == 0)) {
+                // If student has scored above threshold score:
+                if(score > WorksheetGrader.getThresholdScore()) {
+                    student.completedOverScore();
+                }
+                if(WorksheetGrader.isBlankSheet(student.getLastWorksheet())) {
+                    student.completedBlank();
+                }
+                student.completedWorksheet();
+                student.setLastWorksheet(null);
             }
-            if(WorksheetGrader.isBlankSheet(student.getLastWorksheet())) {
-                student.completedBlank();
-            }
-            student.completedWorksheet();
-            student.setLastWorksheet(null);
             ofy().save().entity(student).now();
+            if(hasBlanks) {
+                throw new Exception("y u incomplete");
+            }
             out.println("{ \"success\": \"true\", \"score\": \"" + score + "\" }");
             System.out.println(score);
         } catch(Exception e) {

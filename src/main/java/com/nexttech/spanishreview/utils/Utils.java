@@ -2,24 +2,29 @@ package com.nexttech.spanishreview.utils;
 
 import com.google.api.client.extensions.appengine.datastore.AppEngineDataStoreFactory;
 import com.google.api.client.extensions.appengine.http.UrlFetchTransport;
-import com.google.api.client.googleapis.auth.oauth2.*;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.extensions.appengine.auth.oauth2.AppIdentityCredential;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.classroom.Classroom;
-
-import com.google.appengine.tools.cloudstorage.*;
-
 import com.google.api.services.classroom.ClassroomScopes;
+import com.google.appengine.tools.cloudstorage.GcsService;
+import com.google.appengine.tools.cloudstorage.GcsServiceFactory;
+import com.google.appengine.tools.cloudstorage.RetryParams;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
-import java.io.*;
-
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by plato2000 on 4/23/16.
@@ -44,11 +49,11 @@ public class Utils {
 
     // The list of OAuth 2.0 scopes that are used for student signin
     private static Collection<String> studentScopes = Arrays.asList(
-            new String[] {ClassroomScopes.CLASSROOM_COURSES_READONLY});
+            ClassroomScopes.CLASSROOM_COURSES_READONLY);
 
     // The list of OAuth 2.0 scopes that are used for teacher signin
     private static Collection<String> teacherScopes = Arrays.asList(
-            new String[] {ClassroomScopes.CLASSROOM_ROSTERS_READONLY, "profile", "email"});
+            ClassroomScopes.CLASSROOM_ROSTERS_READONLY, "profile", "email");
 
     // The location of the client secrets file for this project - can be retrieved from the Cloud Platform Console
     private static final String CLIENT_SECRET_FILE = "WEB-INF/private_key.json";

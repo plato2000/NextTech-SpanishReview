@@ -19,6 +19,18 @@
         <servlet-name>worksheet</servlet-name>
         <jsp-file>/worksheet.jsp</jsp-file>
     </servlet>
+    <servlet>
+        <servlet-name>teacher</servlet-name>
+        <jsp-file>/teacher.jsp</jsp-file>
+    </servlet>
+    <servlet>
+        <servlet-name>infoGetter</servlet-name>
+        <servlet-class>com.nexttech.spanishreview.teacher.InfoGetterServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>infoSetter</servlet-name>
+        <servlet-class>com.nexttech.spanishreview.teacher.InfoSetterServlet</servlet-class>
+    </servlet>
 
     <listener>
         <listener-class>com.nexttech.spanishreview.utils.SetupListener</listener-class>
@@ -41,6 +53,18 @@
         <servlet-name>worksheet</servlet-name>
         <url-pattern>/worksheet</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>teacher</servlet-name>
+        <url-pattern>/teacher</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>infoGetter</servlet-name>
+        <url-pattern>/teacher/getInfo</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>infoSetter</servlet-name>
+        <url-pattern>/teacher/setInfo</url-pattern>
+    </servlet-mapping>
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>main</web-resource-name>
@@ -48,6 +72,15 @@
         </web-resource-collection>
         <auth-constraint>
             <role-name>*</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>teacher</web-resource-name>
+            <url-pattern>/teacher/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
         </auth-constraint>
     </security-constraint>
     <filter>
