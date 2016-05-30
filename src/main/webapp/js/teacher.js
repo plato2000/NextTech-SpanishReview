@@ -106,7 +106,7 @@ function appendStudent(name, id, status) {
             .append($("<td>")
                 .text(name)
             ).append($("<td>")
-                .text(status)
+                .text(id == "" ? "Could not find in .MER file" : status)
                 .attr("id", id == "" ? name : id)
                 .attr("class", id == "" ? "no" : "id")
             )
@@ -130,7 +130,7 @@ function listStudents(id) {
         for(i = 0; i < students.length; i++) {
             var student = students[i];
             console.log(student);
-            appendStudent(student.profile.name.fullName, getIdFromName(student.profile.name.fullName), "N/A");
+            appendStudent(student.profile.name.fullName, getIdFromName(student.profile.name.fullName), "Loading...");
         }
         refreshInfoFromServer();
     });
@@ -143,6 +143,7 @@ function selectCourse(id, name) {
     $("#deadline-span").show();
     $("#requirements-span").show();
     $("#class-name").text(name);
+    $("#button-bar").show();
 }
 
 function handleFileSelect(evt) {
@@ -271,7 +272,8 @@ function updateRequirements() {
         id: ids,
         total: $("#total").val(),
         blank: $("#blank").val(),
-        scoredOver: $("#scoredOver").val()
+        scoredOver: $("#scoredOver").val(),
+        deadline: $("#deadline").datepicker("getDate").getTime()
     };
     if (!location.origin)
         location.origin = location.protocol + "//" + location.host;
@@ -290,22 +292,33 @@ function updateRequirements() {
     });
 }
 
-function getName() {
-    gapi.client.load('plus', 'v1').then(function() {
-        var request = gapi.client.plus.people.get({
-            'userId': 'me'
-        });
-        request.then(function(resp) {
-            var heading = document.createElement('h4');
-            var image = document.createElement('img');
-            image.src = resp.result.image.url;
-            heading.appendChild(image);
-            heading.appendChild(document.createTextNode(resp.result.displayName));
-
-            document.getElementById('content').appendChild(heading);
-        }, function(reason) {
-            console.log('Error: ' + reason.result.error.message);
-        });
+function resetUsers() {
+    var elements = document.getElementsByClassName("id");
+    var ids = [];
+    for(var i = 0; i < elements.length; i++) {
+        ids.push(elements[i].id);
+    }
+    var dictToSerialize = {
+        teacher: teacher.profile.name.fullName,
+        id: ids,
+        total: $("#total").val(),
+        blank: $("#blank").val(),
+        scoredOver: $("#scoredOver").val(),
+        deadline: $("#deadline").datepicker("getDate").getTime()
+    };
+    if (!location.origin)
+        location.origin = location.protocol + "//" + location.host;
+    console.log($.toJSON(dictToSerialize));
+    $.ajax({
+        type: "POST",
+        url: location.origin + "/teacher/resetUsers",
+        data: $.toJSON(dictToSerialize),
+        success: function(data) {
+            $("#deadline").datepicker("update", new Date(Number(data.deadline)));
+            $("#total").val(Number(data.total));
+            $("#blank").val(Number(data.blank));
+            $("#scoredOver").val(Number(data.scoredOver));
+        }
     });
 }
 

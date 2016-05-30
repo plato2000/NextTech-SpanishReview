@@ -72,7 +72,7 @@
                     if(user != null) { // Somebody is logged in
                         // Allows functions using the ${} syntax to use variable
                         pageContext.setAttribute("user", user);
-                        MCPSStudent student = ofy().load().type(MCPSStudent.class).id(user.getEmail().substring(0, user.getEmail().indexOf("@"))).now();
+                        MCPSStudent student = ofy().load().type(MCPSStudent.class).id(Long.parseLong(user.getEmail().substring(0, user.getEmail().indexOf("@")))).now();
                         pageContext.setAttribute("student", student);
                         if(student == null) {
                             System.out.println("Student was null");
@@ -129,9 +129,9 @@
         }
         // Stores things in variables to not have to get a new worksheet every time
         String[][] wsArray = ws.getWorksheet();
-        System.out.println("Got worksheet");
+//        System.out.println("Got worksheet");
         student.setLastWorksheet(wsArray);
-        System.out.println("Set last worksheet");
+//        System.out.println("Set last worksheet");
         ofy().save().entity(student).now();
         System.out.println("Saved student");
         List<String> wordBank = ws.getWordBank();
@@ -144,7 +144,7 @@
             <tr>
                 <%
                     // Header row
-                    System.out.println("Reached table loop");
+//                    System.out.println("Reached table loop");
                     for(String item : wsArray[0]) { %>
                 <th id="<%=Utils.getIDMap().get(item)%>"><%=item%>
                 </th>
@@ -186,9 +186,9 @@
         <br/>
         <br/>
         <% // Goes through every word in wordBank, places them in a well
-            System.out.println("Reached word bank loop");
+//            System.out.println("Reached word bank loop");
             for(String word : wordBank) {
-                System.out.println(word);
+//                System.out.println(word);
                 String id = Utils.getIDMap().get(word.replaceAll("\\p{C}", "").replaceAll("[^\\x00-\\x7F]", "")).toString();
         %>
         <div id="<%=id%>" class="well"><%=word%>
@@ -197,7 +197,7 @@
                     }
                 }
             }
-            System.out.println("Reached very end");
+//            System.out.println("Reached very end");
         %>
     </div>
 </div>

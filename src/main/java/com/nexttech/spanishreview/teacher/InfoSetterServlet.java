@@ -25,59 +25,34 @@ public class InfoSetterServlet extends HttpServlet {
         PrintWriter out = resp.getWriter();
         try {
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(req.getReader());
-            StringBuilder json = new StringBuilder();
-            json.append("{\"success\": \"true\", \n");
-            json.append("\"results\": {");
 
             String teacher = (String) jsonObject.get("teacher");
+            int total = Integer.parseInt((String) jsonObject.get("total"));
+            int blank = Integer.parseInt((String) jsonObject.get("blank"));
+            int scoredOver = Integer.parseInt((String) jsonObject.get("scoredOver"));
+            long deadline = (Long) jsonObject.get("deadline");
 //            MCPSStudent student = ofy().load().type(MCPSStudent.class).id(Long.parseLong(email.substring(0, email.indexOf("@")))).now();
             System.out.println(teacher);
 
 
             JSONArray jsonArray = (JSONArray) jsonObject.get("id");
             Iterator iterator = jsonArray.iterator();
-            long id = Long.parseLong((String) iterator.next());
-            MCPSStudent student = ofy().load().type(MCPSStudent.class).id(id).now();
-            if(student == null) {
-                student = new MCPSStudent(id);
-            }
-            student.setTeacher(teacher);
-            ofy().save().entity(student).now();
-            int total = student.getRequiredTotal();
-            int blank = student.getRequiredBlank();
-            int scoredOver = student.getRequiredOverScore();
-            long deadline = student.getDeadline();
-            json.append("\"" + id + "\": ");
-            if(student.metRequirements()) {
-                json.append("\"Completed\"");
-            } else if(student.started()) {
-                json.append("\"Incomplete\"");
-            } else {
-                json.append("\"Not started\"");
-            }
+
             while(iterator.hasNext()) {
-                id = Long.parseLong((String) iterator.next());
-                student = ofy().load().type(MCPSStudent.class).id(id).now();
+                long id = Long.parseLong((String) iterator.next());
+                MCPSStudent student = ofy().load().type(MCPSStudent.class).id(new Long(id)).now();
                 if(student == null) {
+                    System.out.println("Making new student " + id);
                     student = new MCPSStudent(id);
                 }
                 student.setRequiredTotal(total);
                 student.setRequiredBlank(blank);
                 student.setRequiredOverScore(scoredOver);
+                student.setDeadline(deadline);
                 student.setTeacher(teacher);
                 ofy().save().entity(student).now();
-                json.append(",\n");
-                json.append("\"" + id + "\": ");
-                if(student.metRequirements()) {
-                    json.append("\"Completed\"");
-                } else if(student.started()) {
-                    json.append("\"Incomplete\"");
-                } else {
-                    json.append("\"Not started\"");
-                }
             }
-
-            json.append("},\n");
+            StringBuilder json = new StringBuilder("{");
             json.append("\"total\": \"" + total + "\",\n");
             json.append("\"blank\": \"" + blank + "\",\n");
             json.append("\"scoredOver\": \"" + scoredOver + "\",\n");

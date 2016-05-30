@@ -31,6 +31,10 @@
         <servlet-name>infoSetter</servlet-name>
         <servlet-class>com.nexttech.spanishreview.teacher.InfoSetterServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>resetUsers</servlet-name>
+        <servlet-class>com.nexttech.spanishreview.teacher.ResetUsersServlet</servlet-class>
+    </servlet>
 
     <listener>
         <listener-class>com.nexttech.spanishreview.utils.SetupListener</listener-class>
@@ -64,6 +68,10 @@
     <servlet-mapping>
         <servlet-name>infoSetter</servlet-name>
         <url-pattern>/teacher/setInfo</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>resetUsers</servlet-name>
+        <url-pattern>/teacher/resetUsers</url-pattern>
     </servlet-mapping>
     <security-constraint>
         <web-resource-collection>

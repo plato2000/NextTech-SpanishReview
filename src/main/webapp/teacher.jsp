@@ -74,7 +74,7 @@
                         // Gets the authentication handler from the Users API
                         UserService userService = UserServiceFactory.getUserService();
                         User user = userService.getCurrentUser();
-                        System.out.println(user.getUserId());
+//                        System.out.println(user.getUserId());
     //                        System.out.println(user.getEmail().substring(0, user.getEmail().indexOf("@")));
     //                        System.out.println(StringUtils.isNumeric(user.getEmail().substring(0, user.getEmail().indexOf("@"))));
     //                        System.out.println(user.getEmail().substring(user.getEmail().indexOf("@") + 1));
@@ -118,12 +118,35 @@
                     <label for="scoredOver">WS Over 30 Required: </label>
                     <input type="number" class="form-control input-sm" id="scoredOver">
             </div>
+            <div class="btn-group btn-group-justified" id="button-bar" style="display:none;">
+                <a href="javascript:refreshInfoFromServer()" class="btn btn-success"><span class="glyphicon glyphicon-refresh"></span>&nbsp;Refresh Data</a>
+                <a href="javascript:updateRequirements()" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span>&nbsp;Submit Requirements</a>
+                <a data-toggle="modal" data-target="#reset-users" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span>&nbsp;Reset Student Progress</a>
+            </div>
+            <h2>Students:</h2>
             <table class="table table-bordered table-responsive" id="students">
                 <tr>
                     <th>Name</th>
                     <th>Status</th>
                 </tr>
             </table>
+        </div>
+    </div>
+    <div class="modal fade" id="reset-users" tabindex="-1" role="dialog" aria-labelledby="reset-users-label">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="reset-users-label">Are you sure?</h4>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to reset user progress? This means that every worksheet completed by each of the users in the table to this point will no longer count towards the total. This cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" onclick="resetUsers()">Reset progress</button>
+                </div>
+            </div>
         </div>
     </div>
 
