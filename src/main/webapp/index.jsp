@@ -61,9 +61,9 @@
                         UserService userService = UserServiceFactory.getUserService();
                         User user = userService.getCurrentUser();
 
-                        System.out.println(user.getEmail().substring(0, user.getEmail().indexOf("@")));
-                        System.out.println(StringUtils.isNumeric(user.getEmail().substring(0, user.getEmail().indexOf("@"))));
-                        System.out.println(user.getEmail().substring(user.getEmail().indexOf("@") + 1));
+//                        System.out.println(user.getEmail().substring(0, user.getEmail().indexOf("@")));
+//                        System.out.println(StringUtils.isNumeric(user.getEmail().substring(0, user.getEmail().indexOf("@"))));
+//                        System.out.println(user.getEmail().substring(user.getEmail().indexOf("@") + 1));
                         if(userService.isUserAdmin() || !StringUtils.isNumeric(user.getEmail().substring(0, user.getEmail().indexOf("@")))
                                 && user.getEmail().substring(user.getEmail().indexOf("@") + 1).equals("mcpsmd.net")){
                             response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + "/teacher"));
