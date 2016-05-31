@@ -156,7 +156,7 @@
                 <% for(int j = 0; j < wsArray[i].length; j++) {
                     String id = "";
                     if(wsArray[i][j].equals("")) {
-]                %>
+                %>
                 <td class="cell droppable"></td>
                 <% } else {
                     try {
