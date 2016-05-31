@@ -144,7 +144,6 @@
             <tr>
                 <%
                     // Header row
-//                    System.out.println("Reached table loop");
                     for(String item : wsArray[0]) { %>
                 <th id="<%=Utils.getIDMap().get(item)%>"><%=item%>
                 </th>
@@ -156,21 +155,21 @@
             <tr class="worksheet-row">
                 <% for(int j = 0; j < wsArray[i].length; j++) {
                     String id = "";
-                %>
-                <!-- Makes colspan appropriate for rows that are smaller -->
-                <% if(wsArray[i][j].equals("")) {
-                    id = "";
-                %>
+                    if(wsArray[i][j].equals("")) {
+]                %>
                 <td class="cell droppable"></td>
                 <% } else {
                     try {
+                        // Gets the numeric ID from the BiMap in Utils
                         id = Utils.getIDMap().get(wsArray[i][j]).toString();
                     } catch(Exception e) {
                         id = "";
                     }
                 %>
+                <!-- Makes colspan appropriate for rows that are smaller in number of columns -->
                 <td class="cell" id="<%=id%>"
-                    colspan="<%=wsArray[i].length == 3 && j == 2 ? 3 : (wsArray[i].length == 2 && j == 1 ? 4 : 1) %>"><%=wsArray[i][j]%>
+                    colspan="<%=wsArray[i].length == 3 && j == 2 ? 3 : (wsArray[i].length == 2 && j == 1 ? 4 : 1) %>">
+                    <%=wsArray[i][j]%>
                 </td>
                 <%
                         }
