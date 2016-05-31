@@ -58,7 +58,7 @@
 
             <ul class="nav navbar-nav navbar-right">
                 <li>
-                    <button onclick="submitWorksheet()" class="btn btn-primary">Submit</button>
+                    <button onclick="submitWorksheet()" class="btn btn-success">Submit</button>
                 </li>
                 <%
                     // Gets the authentication handler from the Users API
