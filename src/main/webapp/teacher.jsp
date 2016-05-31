@@ -78,7 +78,7 @@
                         pageContext.setAttribute("user", user);
                     %>
                     <li><a id="sign-in" href="javascript:handleAuthClick()">Sign in</a></li>
-                    <li><a href="javascript:signOut()">Sign out</a></li>
+                    <li><a href="<%= userService.createLogoutURL(request.getRequestURI()) %>">Sign out</a></li>
 
                     <!--<li><a href="http://builtwithbootstrap.com/" target="_blank">Built With Bootstrap</a></li>-->
                     <!--<li><a href="https://wrapbootstrap.com/?ref=bsw" target="_blank">WrapBootstrap</a></li>-->

@@ -11,3 +11,9 @@ function blankSheet() {
 function normalSheet() {
     window.location.href = location.origin + "/worksheet?type=regular";
 }
+
+$(function() {
+    if($("#deadline-rel") != null) {
+        $("#deadline-rel").text(" (" + moment(millisDeadline).fromNow() + ")");
+    }
+});

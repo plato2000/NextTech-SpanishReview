@@ -99,7 +99,7 @@
                 <script>
                     $(function () {
                         setTimeout(function () {
-                            $('#signin-failure').modal({keyboard: false})
+                            $('#signin-failure').modal({ backdrop: "static", keyboard: false})
                         }, 1000);
                     });
                 </script>
