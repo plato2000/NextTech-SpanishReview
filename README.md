@@ -18,11 +18,11 @@ To run this sample locally:
 
     $ mvn appengine:devserver
 
-    This will run at `localhost:8080`.
+This will run at `localhost:8080`.
 
 ## Deploying
 
     $ mvn appengine:update
 
-    This will push to `YOUR_PROJECT_ID`.appspot.com.
+This will push to `YOUR_PROJECT_ID`.appspot.com.
 
