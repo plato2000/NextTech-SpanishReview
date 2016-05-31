@@ -9,7 +9,7 @@ A lot of the files in here (such as the .yaml and .xml files) are used by App En
 
 To deploy yourself, you will need to have a billing account set up in your Cloud Platform Console, and then you will have to configure your GCloud SDK to use that account.
 
-The current version of this project is running at [phs-spanishreview.appspot.com](phs-spanishreview.appspot.com).
+The current version of this project is running at [phs-spanishreview.appspot.com](http://phs-spanishreview.appspot.com).
 
 ## Running locally 
 This example uses the
