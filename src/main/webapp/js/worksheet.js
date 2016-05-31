@@ -119,4 +119,8 @@ function get2DArray(id) {
     return array;
 }
 
+$(function() {
+    $("#info-popover").popover();
+});
+
 

@@ -57,9 +57,13 @@
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li><div class="navbar-form navbar-left">
+                <li>
+                    <a id="info-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" title="Info" data-container="body" data-content="Drag the gray boxes on the right to the empty spaces on the left and the gray boxes on the left." data-placement="bottom"><span class="glyphicon glyphicon-info-sign"></span></a>
+                </li>
+                <li>
+                    <div class="navbar-form navbar-left">
                     <button onclick="submitWorksheet()" class="btn btn-success">Submit</button>
-                </div>
+                    </div>
                 </li>
                 <%
                     // Gets the authentication handler from the Users API

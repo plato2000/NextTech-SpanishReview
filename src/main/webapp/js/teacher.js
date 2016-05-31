@@ -101,7 +101,7 @@ function appendDropdown(message, id) {
 }
 
 // Appends a student to the table of students, given a name, ID, and status.
-function appendStudent(name, id, status) {
+function appendStudent(name, id, status, email) {
     console.log("name: " + name + " id: " + id + " status: " + status);
     $("#students").find("tbody")
         .append($("<tr>")
@@ -110,7 +110,7 @@ function appendStudent(name, id, status) {
             ).append($("<td>")
             // If the ID is blank, change what is written to the status section
                 .text(id == "" ? "Could not find in .MER file" : status)
-                .attr("id", id == "" ? name : id)
+                .attr("id", id == "" ? email : id)
                 .attr("class", id == "" ? "no" : "id")
             )
         );
@@ -135,7 +135,7 @@ function listStudents(id) {
         for(i = 0; i < students.length; i++) {
             var student = students[i];
             console.log(student);
-            appendStudent(student.profile.name.fullName, getIdFromName(student.profile.name.fullName), "Loading...");
+            appendStudent(student.profile.name.fullName, getIdFromName(student.profile.emailAddress), "Loading...", student.profile.emailAddress);
         }
         refreshInfoFromServer();
     });
@@ -179,7 +179,7 @@ function readCSV(csv) {
         if(typeof(Storage) !== "undefined") {
             // Store the values as key-value pairs with the name as the key and the ID as the value
             for(var i = 0; i < objects.length; i++) {
-                localStorage.setItem(objects[i]["FIRST"] + " " + objects[i]["LAST"], objects[i]["ID"]);
+                localStorage.setItem((objects[i]["LAST"].slice(0, 3) + objects[i]["FIRST"].slice(0, 1) + objects[i]["ID"].slice(3, 6) + "0").toLowerCase(), objects[i]["ID"]);
             }
             // Store the time that the .MER file was read, so that if a school year has passed, the teacher can reload
             // the file if they want.
@@ -188,7 +188,7 @@ function readCSV(csv) {
             // If no localStorage: store the names as objects in an array
             for(var i = 0; i < objects.length; i++) {
                 var obj = {}
-                var key = objects[i]["FIRST"] + " " + objects[i]["LAST"];
+                var key = (objects[i]["LAST"].slice(0, 3) + objects[i]["FIRST"].slice(0, 1) + objects[i]["ID"].slice(3, 6) + "0").toLowerCase();
                 obj[key] = objects[i]["ID"];
                 currentStudents.push(obj);
             }
@@ -220,22 +220,23 @@ function fileRead() {
     }
 }
 
-// Gets an ID from the full name of a student, given a read file
-function getIdFromName(name) {
+// Gets an ID from the aliased email, given a read file
+function getIdFromName(email) {
+    email = email.split("@")[0].toLowerCase();
     // If the file is read, get the ID
     if(fileRead()) {
         // Get ID from name from localStorage or variable depending on which exists
         if(typeof(Storage) !== "undefined") {
             // Try to get name from localStorage
-            if(localStorage.getItem(name) != null) {
-                return localStorage.getItem(name);
+            if(localStorage.getItem(email) != null) {
+                return localStorage.getItem(email);
             } else {
                 return "";
             }
         } else {
             // Go through currentStudents until name is found, if not found, return ""
             for(var i = 0; i < currentStudents.length; i++) {
-                if(currentStudents[i].name == name) {
+                if(currentStudents[i].name == email) {
                     return currentStudents[i].id;
                 }
             }
