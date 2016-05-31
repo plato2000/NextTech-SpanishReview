@@ -61,21 +61,26 @@
                         UserService userService = UserServiceFactory.getUserService();
                         User user = userService.getCurrentUser();
 
-//                        System.out.println(user.getEmail().substring(0, user.getEmail().indexOf("@")));
-//                        System.out.println(StringUtils.isNumeric(user.getEmail().substring(0, user.getEmail().indexOf("@"))));
-//                        System.out.println(user.getEmail().substring(user.getEmail().indexOf("@") + 1));
+                        // If user is admin (teacher), redirect to teacher page
                         if(userService.isUserAdmin() || !StringUtils.isNumeric(user.getEmail().substring(0, user.getEmail().indexOf("@")))
                                 && user.getEmail().substring(user.getEmail().indexOf("@") + 1).equals("mcpsmd.net")){
+                            // Encoded means the cookie is sent w/ it for authorization on HTTP requests
                             response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + "/teacher"));
 //                            response.sendRedirect(response.encodeRedirectURL(userService.createLogoutURL(request.getRequestURI())));
                             return;
                         }
 
-                        System.out.println();
+                        // Load in student from DataStore
+                        // ofy() is the objectify service, which asks for the type of object to pull (MCPSStudent.class)
+                        // The id is the MCPS student ID, which can be gotten from the email by splitting at the @ symbol
+                        // If this changes at some point, it will break the entire program
                         MCPSStudent student = ofy().load().type(MCPSStudent.class).id(Long.parseLong(user.getEmail().substring(0, user.getEmail().indexOf("@")))).now();
+                        // If student was not in database, it will be null
                         if(student == null) {
+                            // Create a new student given just the email
                             student = new MCPSStudent(user.getEmail());
                             System.out.println("Saving entity in index.jsp too");
+                            // Save student into database so that it exists there now
                             ofy().save().entity(student).now();
                         }
 
@@ -89,18 +94,20 @@
                         if(!user.getEmail().substring(user.getEmail().indexOf("@")).equals("@mcpsmd.net")) { %>
                     <script>
                         $(function(){
+                            // Opens the modal for signin failures
                             setTimeout(function() {$('#signin-failure').appendTo("body").modal({keyboard:false});}, 100);
                         });
                     </script>
-                    <%  } else {
+                    <%
+                        // In case of MCPS account, open modal with info and options to get a worksheet
+                        } else {
                     %>
                     <script>
                         $(function(){
+                            // Opens modal with options for new worksheet
                             setTimeout(function() {$('#normal-modal').appendTo("body").modal({keyboard:false})}, 100);
                         });
                     </script>
-                    <!--<li><a href="http://builtwithbootstrap.com/" target="_blank">Built With Bootstrap</a></li>-->
-                    <!--<li><a href="https://wrapbootstrap.com/?ref=bsw" target="_blank">WrapBootstrap</a></li>-->
                 </ul>
 
             </div>
@@ -111,10 +118,9 @@
     <br />
     <br />
 
+    <!-- The modal dialog that opens on a normal user (MCPS student) -->
     <div class="modal fade" id="normal-modal" role="dialog">
         <div class="modal-dialog">
-
-
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
@@ -124,15 +130,18 @@
                     <%
                         String score = "";
                         try {
+                            // Gets score on last worksheet from URL (if the user just came from a worksheet)
                             score = ((String[]) request.getParameterMap().get("score"))[0];
                         } catch(NullPointerException e) {
 
                         }
+                        // If score exists or is not blank (if it was just gotten through the parameterMap, display it
                         if(!(score == null || score.equals(""))) {
                     %>
                     <h1>Score: <%=score%>/40</h1>
                     <%
                         }
+                        // If a deadline has been set, get the information for it and display
                         if(student.getDeadline() > 0) {
                             Calendar calendar = Calendar.getInstance();
                             calendar.setTimeInMillis(student.getDeadline());
@@ -144,11 +153,15 @@
                     <h2>Deadline: <%=mMonth + "/" + mDay + "/" + mYear%></h2>
                     <%
                         }
+                        // If a teacher has been set (teacher logs in, gets users through classroom, presses submit)
+                        // display teacher name
                         if(!student.getTeacher().equals("")) {
                     %>
                     <h2>Teacher: <%=student.getTeacher()%></h2>
                     <%
                         }
+                        // For worksheet counts: display the number of worksheets completed. If the teacher has
+                        // logged in, the required totals have a value, so display them.
                         String overallWorksheets = "Total Worksheets: " + student.getOverallWorksheets() + " completed";
                         if(!student.getTeacher().equals("")) {
                             overallWorksheets += " out of " + student.getRequiredTotal() + " required";
@@ -171,6 +184,7 @@
                     <p><%=overScore%></p>
 
                 </div>
+                <!-- Buttons to get the two types of worksheets -->
                 <div class="modal-footer">
                     <a class="btn btn-default" href="javascript:blankSheet()">Blank Worksheet</a>
                     <a class="btn btn-default" href="javascript:normalSheet()">Normal Worksheet</a>

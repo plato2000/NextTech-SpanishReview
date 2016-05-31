@@ -74,11 +74,6 @@
                         // Gets the authentication handler from the Users API
                         UserService userService = UserServiceFactory.getUserService();
                         User user = userService.getCurrentUser();
-//                        System.out.println(user.getUserId());
-    //                        System.out.println(user.getEmail().substring(0, user.getEmail().indexOf("@")));
-    //                        System.out.println(StringUtils.isNumeric(user.getEmail().substring(0, user.getEmail().indexOf("@"))));
-    //                        System.out.println(user.getEmail().substring(user.getEmail().indexOf("@") + 1));
-
                         // Allows functions using the ${} syntax to use variable
                         pageContext.setAttribute("user", user);
                     %>
@@ -99,14 +94,17 @@
     <div class="container">
         <div class="row">
             <h1 id="class-name">No class selected.</h1>
+            <!-- File picker -->
             <div class="form-inline" id="file-picker-div">
                 <label for="file-picker" id="mer-file-label">Select .MER file: </label>
                 <input type="file" class="form-control input-sm" id="file-picker">
             </div>
+            <!-- Don't display unless class is selected -->
             <div class="form-inline" id="deadline-span" style="display:none;">
                 <label for="deadline">Deadline: </label>
                 <input type="text" class="form-control input-sm" id="deadline" data-provide="datepicker">
             </div>
+
             <div class="form-inline" id="requirements-span" style="display: none;">
 
                     <label for="total">Total WS Required: </label>
@@ -118,11 +116,15 @@
                     <label for="scoredOver">WS Over 30 Required: </label>
                     <input type="number" class="form-control input-sm" id="scoredOver">
             </div>
+
+            <!-- Button group to refresh info, update requirements, and reset progress -->
             <div class="btn-group btn-group-justified" id="button-bar" style="display:none;">
                 <a href="javascript:refreshInfoFromServer()" class="btn btn-success"><span class="glyphicon glyphicon-refresh"></span>&nbsp;Refresh Data</a>
                 <a href="javascript:updateRequirements()" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span>&nbsp;Submit Requirements</a>
                 <a data-toggle="modal" data-target="#reset-users" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span>&nbsp;Reset Student Progress</a>
             </div>
+
+            <!-- Students table -->
             <h2>Students:</h2>
             <table class="table table-bordered table-responsive" id="students">
                 <tr>
@@ -132,6 +134,8 @@
             </table>
         </div>
     </div>
+
+    <!-- Reset users confirmation modal dialog -->
     <div class="modal fade" id="reset-users" tabindex="-1" role="dialog" aria-labelledby="reset-users-label">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

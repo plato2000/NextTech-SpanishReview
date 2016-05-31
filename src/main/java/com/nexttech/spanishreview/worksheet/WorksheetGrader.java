@@ -14,6 +14,7 @@ public class WorksheetGrader {
     // The String[][] that contains the answer key in the form of id numbers
     private static String[][] correctWorksheet = null;
 
+    // The score to be above to get credit for
     private static final int THRESHOLD_SCORE = 30;
 
     /**
@@ -23,42 +24,40 @@ public class WorksheetGrader {
      * @throws IOException
      */
     public static String[][] getCorrectKingWorksheet() throws IOException {
+        // If the correct worksheet has already been generated, then don't do this process again
         if(correctWorksheet == null) {
             BiMap<String, Integer> idMap = Utils.getIDMap();
             WorksheetGenerator worksheetGenerator = new WorksheetGenerator();
+            // Gets the base worksheet in String[][] form
             String[][] stringWorksheet = worksheetGenerator.getBaseWorksheet().getWorksheet();
+            // Make correctWorksheet in the size of stringWorksheet
             correctWorksheet = new String[stringWorksheet.length][];
             for(int i = 0; i < stringWorksheet.length - 2; i++) {
                 correctWorksheet[i] = new String[stringWorksheet[i].length];
                 for(int j = 0; j < stringWorksheet[i].length; j++) {
-//                    System.out.println((int) stringWorksheet[i][j].charAt(0));
-//                    System.out.println((int) idMap.inverse().get(5).charAt(0));
-//                    System.out.println(StringUtils.differenceAt(idMap.inverse().get(5), stringWorksheet[i][j]));
-//                    System.out.println(idMap.inverse().get(5).equals(stringWorksheet[i][j]));
+                    // Set each element in correctWorksheet to the number ID of the word, from the idMap
                     correctWorksheet[i][j] = idMap.get(stringWorksheet[i][j]).toString();
-//                    System.out.println(correctWorksheet[i][j]);
-//                    System.out.println(idMap.inverse().get(40).equals(stringWorksheet[i][j]));
-//                    System.out.print(correctWorksheet[i][j] + " ");
                 }
-//                System.out.println();
             }
+            // For the last two rows, subjunctive and imperative, do special things
             for(int i = stringWorksheet.length - 2; i < stringWorksheet.length; i++) {
+                // Copy size from base worksheet
                 correctWorksheet[i] = new String[stringWorksheet[i].length];
+                // Set tense name to the id
                 correctWorksheet[i][0] = idMap.get(stringWorksheet[i][0]).toString();
-//                System.out.print(correctWorksheet[i][0] + " ");
+                // Puts the ID number for each word into a list
                 for(int j = 1; j < stringWorksheet[i].length; j++) {
+                    // Gets the words that go into the blanks in the worksheet
                     List<String> currentSpot = WorksheetGenerator.removeBlanksToWordBank(stringWorksheet[i]);
                     List<Integer> currentInt = new ArrayList<Integer>();
                     for(String s : currentSpot) {
                         currentInt.add(idMap.get(s));
                     }
+                    // Sets the element in the array to a comma separated list of numbers for that cell
                     correctWorksheet[i][j] = Utils.joinList(currentInt);
-//                    System.out.print(correctWorksheet[i][j] + " ");
                 }
-//                System.out.println();
             }
         }
-//        Utils.printArray(correctWorksheet[0], System.out);
         return correctWorksheet;
     }
 
@@ -74,9 +73,6 @@ public class WorksheetGrader {
     public static int getScore(String[][] origWorksheet, String[][] toBeGraded) {
         try {
             String[][] answerKey = getCorrectKingWorksheet();
-//            PrettyPrinter pr = new PrettyPrinter(System.out);
-//            pr.print(answerKey);
-//            pr.print(toBeGraded);
             // The clauses that have return 0 mean there was tampering somewhere.
             if(origWorksheet.length != toBeGraded.length) {
                 System.out.println("Wrong size");
@@ -89,8 +85,6 @@ public class WorksheetGrader {
             for(int i = 0; i < origWorksheet[0].length; i++) {
                 if(!Utils.getIDMap().get(origWorksheet[0][i]).toString().equals(toBeGraded[0][i])) {
                     System.out.println("Headers are wrong");
-//                    Utils.printArray(origWorksheet[0], System.out);
-//                    Utils.printArray(toBeGraded[0], System.out);
                     System.out.println(origWorksheet[0][i] + " " + toBeGraded[0][i]);
                     return 0;
                 }
@@ -106,8 +100,6 @@ public class WorksheetGrader {
                 }
 
                 // If it is Command form or Subjunctive form row
-//                System.out.println(origWorksheet[i][0]);
-//                System.out.println(Utils.getIDMap().get(origWorksheet[i][0]));
                 if(!origWorksheet[i][0].equals("") && (Utils.getIDMap().get(origWorksheet[i][0]).toString().equals("46")
                         || Utils.getIDMap().get(origWorksheet[i][0]).toString().equals("26"))) {
                     if(!Utils.getIDMap().get(origWorksheet[i][0]).toString().equals(toBeGraded[i][0])) {
@@ -124,10 +116,31 @@ public class WorksheetGrader {
                         }
                     }
 
+                    // Subjunctive
+                    // Split by comma, give points for each blank (there are four blanks)
+                    if(toBeGraded[i][0].equals("26")) {
+                        String[] subjunctiveArray = toBeGraded[i][1].split(",");
+                        String[] correctSubjunctiveArray = answerKey[graderIndex][1].split(",");
+                        if(subjunctiveArray.length != correctSubjunctiveArray.length) {
+                            System.out.println("The amount of things in the subjunctive row was wrong.");
+                            return 0;
+                        }
+                        for(int p = 0; p < correctSubjunctiveArray.length; p++) {
+                            if(correctSubjunctiveArray[p].equals(subjunctiveArray[p])) {
+                                currScore++;
+                            }
+                        }
+                    }
+                    // Imperative:
                     // If the entire thing was right, add four points - since irregular number of blanks, this is best
                     // way to do it
-                    if(answerKey[graderIndex][1].equals(toBeGraded[i][1])) {
-                        currScore += 4;
+                    if(toBeGraded[i][0].equals("46")) {
+                        if(answerKey[graderIndex][1].equals(toBeGraded[i][1] + "," + toBeGraded[i][2])) {
+                            currScore += 4;
+                        } else {
+                            System.out.println("In subjunctive or imperative: " + answerKey[graderIndex][1] + " vs " + toBeGraded[i][1]);
+
+                        }
                     }
                 } else {
                     // Find the index of the item in the row that was given to the student
@@ -158,6 +171,8 @@ public class WorksheetGrader {
                         if(answerKey[graderIndex][j].equals(toBeGraded[i][j]) && j != indexOfGiven) {
                             System.out.println(toBeGraded[i][j] + " was correct");
                             currScore++;
+                        } else if(!toBeGraded[i][j].equals("")){
+                            System.out.println(toBeGraded[i][j] + " was incorrect");
                         }
                     }
                 }
@@ -178,6 +193,7 @@ public class WorksheetGrader {
      * @return Boolean, true if worksheet is blank template
      */
     public static boolean isBlankSheet(String[][] worksheet) {
+        // Iterates through each row, if the first element is blank, then the worksheet wasn't blank
         for(String[] row : worksheet) {
             if(row[0].equals("")) {
                 return false;
@@ -186,6 +202,12 @@ public class WorksheetGrader {
         return true;
     }
 
+    /**
+     * Checks if the worksheet is fully filled out. This check is also done client side, but it is done here to bypass
+     * possible client side tampering with the JavaScript.
+     * @param worksheet A String[][] that represents the worksheet to check
+     * @return true if the worksheet has blanks, false otherwise
+     */
     public static boolean hasBlanksInSheet(String[][] worksheet) {
         for(String[] row : worksheet) {
             for(String s : row) {

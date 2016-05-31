@@ -259,22 +259,24 @@ public class WorksheetGenerator {
      * @throws IOException
      */
     private JSONObject jsonObjectFromPath(String path) throws ParseException, IOException {
-//        System.out.println("Current path: " + System.getProperty("user.dir"));
         String content = readFileAsString(path);
         return (JSONObject) new JSONParser().parse(content);
     }
 
     /**
-     * Gets the entire file at filePath as a String
+     * Gets the entire file at filePath as a String, 1024 chars at a time
      * @param filePath The relative or absolute path of the file to get as a String
      * @return A String that contains the contents of the file at filePath
      * @throws IOException
      */
     private String readFileAsString(String filePath) throws IOException {
+        // The String to add things to from the buffer of characters
         StringBuffer fileData = new StringBuffer();
         BufferedReader reader = new BufferedReader(
                 new FileReader(filePath));
+        // The buffer to read characters into at a time
         char[] buf = new char[1024];
+        // While there is something to read into the buffer, it is read in and appended to fileData
         int numRead=0;
         while((numRead=reader.read(buf)) != -1){
             String readData = String.valueOf(buf, 0, numRead);

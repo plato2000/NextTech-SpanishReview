@@ -58,7 +58,7 @@
 
             <ul class="nav navbar-nav navbar-right">
                 <li>
-                    <button onclick="submitWorksheet()" class="btn btn-default">Submit</button>
+                    <button onclick="submitWorksheet()" class="btn btn-primary">Submit</button>
                 </li>
                 <%
                     // Gets the authentication handler from the Users API
@@ -185,10 +185,9 @@
         <br/>
         <br/>
         <br/>
-        <% // Goes through every word in wordBank, places them in a well
-//            System.out.println("Reached word bank loop");
+        <%
+            // Goes through every word in wordBank, places them in a well
             for(String word : wordBank) {
-//                System.out.println(word);
                 String id = Utils.getIDMap().get(word.replaceAll("\\p{C}", "").replaceAll("[^\\x00-\\x7F]", "")).toString();
         %>
         <div id="<%=id%>" class="well"><%=word%>
@@ -197,7 +196,6 @@
                     }
                 }
             }
-//            System.out.println("Reached very end");
         %>
     </div>
 </div>

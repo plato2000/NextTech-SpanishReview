@@ -1,13 +1,12 @@
-package com.nexttech.spanishreview.utils;
-
 /**
  * Created by Lyubomyr Shaydariv from StackOverflow
  * http://stackoverflow.com/questions/11383070/pretty-print-2d-array-in-java
  */
+package com.nexttech.spanishreview.utils;
+
 import java.io.PrintStream;
 
 import static java.lang.String.format;
-import static java.lang.System.out;
 
 public final class PrettyPrinter {
 

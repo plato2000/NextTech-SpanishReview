@@ -32,11 +32,10 @@ public class MCPSStudent {
     // The name/email of the teacher
     String teacher;
 
+    // The variables representing the number of worksheets required to get credit for the assignment
     int requiredTotal;
     int requiredOverScore;
     int requiredBlank;
-
-//    long initTime;
 
     // The last served worksheet
     @Serialize String[][] lastWorksheet;
@@ -86,12 +85,23 @@ public class MCPSStudent {
 
     }
 
+    /**
+     * Called when the student has completed a worksheet over the given score
+     */
     public void completedOverScore() {
         this.overScore++;
     }
+
+    /**
+     * Called when the student has completed any worksheet
+     */
     public void completedWorksheet() {
         this.overallWorksheets++;
     }
+
+    /**
+     * Called when the student has completed a blank worksheet
+     */
     public void completedBlank() {
         this.blankWorksheets++;
     }
@@ -182,6 +192,10 @@ public class MCPSStudent {
         }
     }
 
+    /**
+     * Checks if the student has met the requirements set by their own fields
+     * @return true if the student has met the requirements, false otherwise
+     */
     public boolean metRequirements() {
         if(getOverallWorksheets() >= getRequiredTotal()) {
             if(getBlankWorksheets() >= getRequiredBlank()) {
@@ -193,6 +207,10 @@ public class MCPSStudent {
         return false;
     }
 
+    /**
+     * Checks if the student has done anything on the site at all
+     * @return true if the student has completed at least one worksheet, false otherwise
+     */
     public boolean started() {
         return getOverallWorksheets() > 0;
     }
@@ -209,7 +227,6 @@ public class MCPSStudent {
                 ", deadline=" + deadline +
                 ", teacher='" + teacher + '\'' +
                 ", lastWorksheet=" + Arrays.toString(lastWorksheet) +
-//                ", initTime=" + initTime +
                 '}';
     }
 }
