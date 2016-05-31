@@ -95,7 +95,7 @@
                     <script>
                         $(function(){
                             // Opens the modal for signin failures
-                            setTimeout(function() {$('#signin-failure').appendTo("body").modal({keyboard:false});}, 100);
+                            setTimeout(function() {$('#signin-failure').appendTo("body").modal({ backdrop: "static", keyboard:false});}, 100);
                         });
                     </script>
                     <%
@@ -105,7 +105,7 @@
                     <script>
                         $(function(){
                             // Opens modal with options for new worksheet
-                            setTimeout(function() {$('#normal-modal').appendTo("body").modal({keyboard:false})}, 100);
+                            setTimeout(function() {$('#normal-modal').appendTo("body").modal({backdrop: "static",keyboard:false})}, 100);
                         });
                     </script>
                 </ul>
@@ -147,7 +147,7 @@
                             calendar.setTimeInMillis(student.getDeadline());
 
                             int mYear = calendar.get(Calendar.YEAR);
-                            int mMonth = calendar.get(Calendar.MONTH);
+                            int mMonth = calendar.get(Calendar.MONTH) + 1;
                             int mDay = calendar.get(Calendar.DAY_OF_MONTH);
                     %>
                     <h2>Deadline: <%=mMonth + "/" + mDay + "/" + mYear%></h2>
