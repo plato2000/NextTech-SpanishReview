@@ -42,7 +42,7 @@
             src="https://cdnjs.cloudflare.com/ajax/libs/jquery-json/2.5.1/jquery.json.min.js"></script>
 
 
-    <script src="/js/teacher.js"></script>
+    <script src="/js/teacher.min.js"></script>
 
     <!-- Google sign in stuff -->
     <script src="https://apis.google.com/js/client.js?onload=checkAuth"></script>
