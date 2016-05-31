@@ -64,6 +64,11 @@ public class Utils {
     private static BiMap<String, Integer> wordIDMap = null;
 
     /**
+     * Private constructor to prevent initialization of a static class.
+     */
+    private Utils() {}
+
+    /**
      * Gets the clientSecrets from CLIENT_SECRET_FILE the first time it is called, then just returns clientSecrets
      * Unused as of now, may be used in future if there is a transition to OAuth 2.0 for all authentication.
      * @return the Client Secrets (private key, other similar fields) as a GoogleClientSecrets object

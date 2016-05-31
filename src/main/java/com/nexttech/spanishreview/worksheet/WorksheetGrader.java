@@ -18,6 +18,11 @@ public class WorksheetGrader {
     private static final int THRESHOLD_SCORE = 30;
 
     /**
+     * Private constructor to prevent initialization of a static class
+     */
+    private WorksheetGrader() {}
+
+    /**
      * If correctWorksheet is null, converts a stringWorksheet from WorksheetGenerator to id number format, using
      * the BiMap in Utils. It sets this converted worksheet to correctWorksheet, so that this only has to be done once.
      * @return correctWorksheet
