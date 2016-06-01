@@ -404,5 +404,6 @@ $(function() {
             $("#mer-file-label").text(".MER file loaded from " + moment(Number(localStorage.getItem("time"))).fromNow())
        }
     }
+    $("#info-popover").popover();
 });
 

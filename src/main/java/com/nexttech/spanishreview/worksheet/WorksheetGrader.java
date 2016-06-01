@@ -1,6 +1,7 @@
 package com.nexttech.spanishreview.worksheet;
 
 import com.google.common.collect.BiMap;
+import com.nexttech.spanishreview.utils.PrettyPrinter;
 import com.nexttech.spanishreview.utils.Utils;
 
 import java.io.IOException;
@@ -38,6 +39,7 @@ public class WorksheetGrader {
             // Make correctWorksheet in the size of stringWorksheet
             correctWorksheet = new String[stringWorksheet.length][];
             for(int i = 0; i < stringWorksheet.length - 2; i++) {
+//                Utils.printArray(stringWorksheet[i], System.out);
                 correctWorksheet[i] = new String[stringWorksheet[i].length];
                 for(int j = 0; j < stringWorksheet[i].length; j++) {
                     // Set each element in correctWorksheet to the number ID of the word, from the idMap
@@ -63,6 +65,8 @@ public class WorksheetGrader {
                 }
             }
         }
+        PrettyPrinter p = new PrettyPrinter(System.out);
+        p.print(correctWorksheet);
         return correctWorksheet;
     }
 

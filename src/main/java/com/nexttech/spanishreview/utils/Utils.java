@@ -275,6 +275,11 @@ public class Utils {
             wordIDMap.forcePut("infinitive +<br />&iacute;a&emsp;&emsp;&emsp;&emsp;&iacute;amos<br />&iacute;as&emsp;&emsp;&emsp;&emsp;&iacute;ais<br />&iacute;a&emsp;&emsp;&emsp;&emsp;&iacute;an", 53);
             wordIDMap.forcePut("infinitive +<br />&eacute;&emsp;&emsp;&emsp;&emsp;emos<br />&aacute;s&emsp;&emsp;&emsp;&emsp;&eacute;is<br />&aacute;&emsp;&emsp;&emsp;&emsp;&aacute;n", 54);
             wordIDMap.forcePut("1st subject", 55);
+            wordIDMap.forcePut("Present", 56);
+            wordIDMap.forcePut("verb, verbs<br />do, does verb<br /> am, is, are verbing<br />(will verb)", 57);
+            wordIDMap.forcePut("o&emsp;&emsp;&emsp;&emsp;amos<br />as&emsp;&emsp;&emsp;&emsp;&aacute;is<br />a&emsp;&emsp;&emsp;&emsp;an", 58);
+            wordIDMap.forcePut("o&emsp;&emsp;&emsp;&emsp;emos<br />es&emsp;&emsp;&emsp;&emsp;&eacute;is<br />e&emsp;&emsp;&emsp;&emsp;en", 59);
+            wordIDMap.forcePut("o&emsp;&emsp;&emsp;&emsp;imos<br />es&emsp;&emsp;&emsp;&emsp;&iacute;s<br />e&emsp;&emsp;&emsp;&emsp;en", 60);
         }
         return wordIDMap;
     }

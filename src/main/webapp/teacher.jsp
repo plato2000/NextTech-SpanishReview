@@ -70,6 +70,9 @@
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a id="info-popover" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" title="Info" data-container="body" data-content="Log in, select a .MER file, and select a course. Then set requirements, and view results." data-placement="bottom"><span class="glyphicon glyphicon-info-sign"></span></a>
+                    </li>
                     <%
                         // Gets the authentication handler from the Users API
                         UserService userService = UserServiceFactory.getUserService();

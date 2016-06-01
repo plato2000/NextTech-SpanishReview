@@ -1,5 +1,6 @@
 package com.nexttech.spanishreview.worksheet;
 
+import com.nexttech.spanishreview.utils.Utils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -187,39 +188,39 @@ public class WorksheetGenerator {
      * @return A 2D array - a table - with worksheet stuff in it
      */
     private String[][] kingJSONToStringArray(JSONObject json) {
-        String[][] kingWorksheet = new String[10][];
+        String[][] kingWorksheet = new String[11][];
         // Put in headers
         kingWorksheet[0] = new String[] {"Tense", "Translation", "AR", "ER", "IR"};
         // Go through rest of rows
         for(int i = 1; i < kingWorksheet.length; i++) {
             // If it is one of the regular rows:
-            if(!(i > 7)) {
+            if(!(i > 8)) {
                 kingWorksheet[i] = new String[5];
                 String key;
                 // Sets the json key to use given a number - to go through the keys in order
                 switch(i) {
-                    case 0:
+                    case 1:
                         key = "Present";
                         break;
-                    case 1:
+                    case 2:
                         key = "Preterite";
                         break;
-                    case 2:
+                    case 3:
                         key = "Imperfect";
                         break;
-                    case 3:
+                    case 4:
                         key = "Future";
                         break;
-                    case 4:
+                    case 5:
                         key = "Conditional";
                         break;
-                    case 5:
+                    case 6:
                         key = "Present Progressive";
                         break;
-                    case 6:
+                    case 7:
                         key = "Present Perfect";
                         break;
-                    case 7:
+                    case 8:
                         key = "Present Subjunctive";
                         break;
                     default:
@@ -231,16 +232,17 @@ public class WorksheetGenerator {
                     // Puts in the String representation of the object at [key][j]
                     kingWorksheet[i][j] = (((JSONObject) json.get(key)).get(kingWorksheet[0][j])).toString().replaceAll("\\p{C}", "").replaceAll("[^\\x00-\\x7F]", "");
                 }
+                Utils.printArray(kingWorksheet[i], System.out);
             } else {
                 // In special case 1 (i == 8)
-                if(i == 8) {
+                if(i == 9) {
                     kingWorksheet[i] = new String[3];
                     // Specially adds the 3 items in this row
                     kingWorksheet[i][0] = "Command (Imperative)";
                     kingWorksheet[i][1] = (((JSONObject) json.get(kingWorksheet[i][0])).get("affNeg")).toString().replaceAll("\\p{C}", "").replaceAll("[^\\x00-\\x7F]", "");
                     kingWorksheet[i][2] = (((JSONObject) json.get(kingWorksheet[i][0])).get("allCommands")).toString().replaceAll("\\p{C}", "").replaceAll("[^\\x00-\\x7F]", "");
                 // In special case 2 (i == 9)
-                } else if(i == 9) {
+                } else if(i == 10) {
                     kingWorksheet[i] = new String[2];
                     // Specially adds the 2 items to this row
                     kingWorksheet[i][0] = "Subjunctive formula";
