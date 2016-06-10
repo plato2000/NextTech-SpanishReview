@@ -129,7 +129,7 @@
 
             <!-- Students table -->
             <h2>Students:</h2>
-            <table class="table table-bordered table-responsive" id="students">
+            <table class="table table-bordered table-responsive table-hover" id="students">
                 <tr>
                     <th>Name</th>
                     <th>Status</th>
@@ -151,7 +151,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-danger" onclick="resetUsers()">Reset progress</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="resetUsers()">Reset progress</button>
                 </div>
             </div>
         </div>

@@ -143,6 +143,7 @@ function listStudents(id) {
 
 // Called when course is selected from dropdown. Shows hidden elements, lists students, sets currentCourse variable
 function selectCourse(id, name) {
+    $("#students > tr").slice(1).remove();
     currentCourse.id = id;
     currentCourse.name = name;
     listStudents(id);
@@ -347,6 +348,7 @@ function updateRequirements() {
 
 // Reset all data for users to whatever requirements are in the form
 function resetUsers() {
+    console.log("Resetting...");
     // Get list of student IDs
     var elements = document.getElementsByClassName("id");
     var ids = [];
