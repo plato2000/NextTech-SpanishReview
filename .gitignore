@@ -37,6 +37,12 @@ src/main/webapp/WEB-INF/private_key.json
 
 # IntelliJ
 /out/
+*.iml
+*.eml
+.classpath
+.project
+.idea
+NextTech-SpanishReview.userlibraries
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
