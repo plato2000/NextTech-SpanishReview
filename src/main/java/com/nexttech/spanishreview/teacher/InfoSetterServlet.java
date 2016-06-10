@@ -11,7 +11,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -46,11 +49,16 @@ public class InfoSetterServlet extends HttpServlet {
             // Get list of student IDs to set requirements for
             JSONArray jsonArray = (JSONArray) jsonObject.get("id");
             Iterator iterator = jsonArray.iterator();
-
+            List<Long> ids = new ArrayList<>();
             while(iterator.hasNext()) {
-                long id = Long.parseLong((String) iterator.next());
+                ids.add(Long.parseLong((String) iterator.next()));
+            }
+
+            Map<Long, MCPSStudent> students = ofy().load().type(MCPSStudent.class).ids(ids);
+
+            for(Long id : ids) {
                 // Get student with ID or make new one if it doesn't exist
-                MCPSStudent student = ofy().load().type(MCPSStudent.class).id(new Long(id)).now();
+                MCPSStudent student = students.get(id);
                 if(student == null) {
                     System.out.println("Making new student " + id);
                     student = new MCPSStudent(id);
@@ -62,8 +70,9 @@ public class InfoSetterServlet extends HttpServlet {
                 student.setDeadline(deadline);
                 student.setTeacher(teacher);
                 // Save student after requirements were set
-                ofy().save().entity(student).now();
+                students.put(id, student);
             }
+            ofy().save().entities(students.values()).now();
             // Return what everything was set to
             StringBuilder json = new StringBuilder("{");
             json.append("\"total\": \"" + total + "\",\n");

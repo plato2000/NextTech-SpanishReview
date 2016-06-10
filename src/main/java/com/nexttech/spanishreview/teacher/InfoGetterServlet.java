@@ -11,7 +11,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -35,6 +38,7 @@ public class InfoGetterServlet extends HttpServlet {
         try {
             // Reads HTTP request parameters as JSON
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(req.getReader());
+            System.out.println(jsonObject);
             // StringBuilder for the output JSON
             StringBuilder json = new StringBuilder();
             json.append("{\"success\": \"true\", \n");
@@ -46,26 +50,34 @@ public class InfoGetterServlet extends HttpServlet {
 
             // Get the array of IDs to get info for
             JSONArray jsonArray = (JSONArray) jsonObject.get("id");
+            List<Long> ids = new ArrayList<>();
             Iterator iterator = jsonArray.iterator();
 
-            // Look at the first ID in that list
-            long id = Long.parseLong((String) iterator.next());
+            while(iterator.hasNext()) {
+                ids.add(Long.parseLong((String) iterator.next()));
+            }
+
+            Map<Long, MCPSStudent> students = ofy().load().type(MCPSStudent.class).ids(ids);
+
             // Load in MCPSStudent for that id
-            MCPSStudent student = ofy().load().type(MCPSStudent.class).id(id).now();
+            MCPSStudent student = students.get(ids.get(0));
             if(student == null) {
-                student = new MCPSStudent(id);
+                student = new MCPSStudent(ids.get(0));
             }
             // Set teacher to teacher name from the request
             student.setTeacher(teacher);
             // Save student after setting teacher
-            ofy().save().entity(student).now();
+            students.put(ids.get(0), student);
+
+            System.out.println(student);
+
             // Get requirements for students
             int total = student.getRequiredTotal();
             int blank = student.getRequiredBlank();
             int scoredOver = student.getRequiredOverScore();
             long deadline = student.getDeadline();
             // Write whether the student has met requirements to the JSON to return
-            json.append("\"" + id + "\": ");
+            json.append("\"" + ids.get(0) + "\": ");
             if(student.metRequirements()) {
                 json.append("\"Completed\"");
             } else if(student.started()) {
@@ -74,12 +86,12 @@ public class InfoGetterServlet extends HttpServlet {
                 json.append("\"Not started\"");
             }
             // Repeat for all the rest of the students
-            while(iterator.hasNext()) {
-                id = Long.parseLong((String) iterator.next());
-                student = ofy().load().type(MCPSStudent.class).id(id).now();
+            for(Long id : ids) {
+                student = students.get(id);
                 if(student == null) {
                     student = new MCPSStudent(id);
                 }
+                System.out.println(student);
                 // Set the requirements to whatever they were for the first student to make sure all of the students
                 // have the same requirements
                 student.setRequiredTotal(total);
@@ -87,7 +99,7 @@ public class InfoGetterServlet extends HttpServlet {
                 student.setRequiredOverScore(scoredOver);
                 student.setDeadline(deadline);
                 student.setTeacher(teacher);
-                ofy().save().entity(student).now();
+                students.put(id, student);
                 json.append(",\n");
                 json.append("\"" + id + "\": ");
                 if(student.metRequirements()) {
@@ -98,6 +110,7 @@ public class InfoGetterServlet extends HttpServlet {
                     json.append("\"Not started\"");
                 }
             }
+            ofy().save().entities(students.values()).now();
             // Append requirements to the JSON so the teacher can see and change them
             json.append("},\n");
             json.append("\"total\": \"" + total + "\",\n");
